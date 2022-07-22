@@ -8,6 +8,7 @@ Download directly for your system [below](#download-binary)!
 - [x] system-based dark / light mode switching 
 - [ ] preferences pane (planned for next version)
 - [ ] notifications (planned for next version)
+- [ ] automated local backups of projects (planned for future version)
 
 
 ## How it works
