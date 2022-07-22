@@ -18,19 +18,19 @@ If there is interest in this project, I will create add it to Homebrew for easy 
 For now, the following binaries have been precompiled and can be downloaded directly:
 
 ### **Mac**
-* Apple Silicon (M1/M2)
-* Intel (64-bit only)
+* [Apple Silicon (M1/M2)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-darwin-arm64.zip)
+* [Intel (64-bit only)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-darwin-x64.zip)
 
 ### **Linux**
-* ARM64 (64-bit)
-* ARMv7L (32-bit)
-* X64 (64-bit)
-* IA32 (32-bit)
+* [ARM64 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-linux-arm64.zip)
+* [ARMv7L (32-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-linux-armv7l.zip)
+* [X64 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-linux-x64.zip)
+* [IA32 (32-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-linux-ia32.zip)
 
 ### **Windows**
-* X86 (64-bit)
-* X86 (32-bit)
-* ARM64 (64-bit)
+* [X86 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-x64.zip)
+* [X86 (32-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-ia32.zip)
+* [ARM64 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-arm64.zip)
 
 If your platform is missing, let me know and I will add it, or compile it yourself using the instructions below. 
 

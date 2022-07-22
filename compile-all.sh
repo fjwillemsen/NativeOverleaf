@@ -15,13 +15,13 @@ $basecommand $platform --arch x64 --darwin-dark-mode-support $icon
 platform="--platform linux"
 icon="--icon Icon/base_icon.png"
 $basecommand $platform --arch arm64 $icon
-$basecommand $platform linux --arch armv7l $icon
-$basecommand $platform linux --arch x64 $icon
-$basecommand $platform linux --arch ia32 $icon
+$basecommand $platform --arch armv7l $icon
+$basecommand $platform --arch x64 $icon
+$basecommand $platform --arch ia32 $icon
 
 # Windows
 platform="--platform windows"
 icon="--icon Icon/Windows.ico"
 $basecommand $platform --arch arm64 $icon
-$basecommand $platform windows --arch x64 $icon
-$basecommand $platform windows --arch ia32 $icon
+$basecommand $platform --arch x64 $icon
+$basecommand $platform --arch ia32 $icon
