@@ -1,6 +1,7 @@
 # Native Overleaf
 Overleaf is a fantastic webtool for writing and cooperating LaTeX documents. 
 However, would it not be even better if it were to behave like a native app on your system? 
+Download directly for your system [below](#download-binary)!
 
 ## Features
 - [x] standalone native application
