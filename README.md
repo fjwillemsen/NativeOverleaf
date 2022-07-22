@@ -9,21 +9,25 @@ However, would it not be even better if it were to behave like a native app on y
 - [ ] notifications (planned for next version)
 
 
+## How it works
+Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app. While this is not optimally efficient and we may switch to a better approach in the future, it does provide compatibility with a large number of platforms. 
+
+
 ## Download binary
 If there is interest in this project, I will create add it to Homebrew for easy updates. 
 For now, the following binaries have been precompiled and can be downloaded directly:
 
-### Mac
+### **Mac**
 * Apple Silicon (M1/M2)
 * Intel (64-bit only)
 
-### Linux
+### **Linux**
 * ARM64 (64-bit)
 * ARMv7L (32-bit)
 * X64 (64-bit)
 * IA32 (32-bit)
 
-### Windows
+### **Windows**
 * X86 (64-bit)
 * X86 (32-bit)
 * ARM64 (64-bit)
