@@ -12,7 +12,7 @@ Download directly for your system [below](#download-binary)!
 
 
 ## How it works
-Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app. While this is not optimally efficient and we may switch to a better approach in the future, it does provide compatibility with a large number of platforms. 
+Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native feature with a large number of supported platforms. 
 
 
 ## Download binary
