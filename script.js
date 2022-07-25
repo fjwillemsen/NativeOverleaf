@@ -18,6 +18,15 @@ var notificationCounter = 0
 var lastNotificationResetTimestamp = Date.now()
 const originalDocumentTitle = document.title
 
+// prevent the document (window) title from being overwritten by Overleaf when a new message comes in
+Object.defineProperty(document, 'title', {
+    set: function (newValue) {
+        if(newValue != "" && newValue != "New Message"){
+            document.getElementsByTagName("title")[0].innerHTML = newValue;
+        }
+    },
+});
+
 function switchColorMode(preference) {
     scope = angular.element('[ng-controller=SettingsController]').scope();
     if (scope) {
@@ -163,9 +172,7 @@ if (notifications == true) {
                 if (Date.now() > lastNotificationResetTimestamp + (2*1000)) {
                     for (const message_index in mutations.addedNodes) {
                         message = mutations.addedNodes[message_index]
-                        // console.log(message)
                         if (message.getElementsByClassName) {
-                            // console.log(message.getElementsByClassName("date"))
                             wrapper = message.getElementsByClassName("message-wrapper")[0]
                             // there is only a name if the sender is not self
                             if (wrapper.getElementsByClassName('name').length) {
