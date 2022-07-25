@@ -15,7 +15,7 @@ editortheme_light = editorThemes_light[0]
 
 // global variables
 var notificationCounter = 0
-var latestNotificationTimestamp = Date.now()
+var lastNotificationResetTimestamp = Date.now()
 const originalDocumentTitle = document.title
 
 function switchColorMode(preference) {
@@ -50,11 +50,11 @@ function updateCounter(countToAdd) {
 function resetCounter() {
     notificationCounter = 0
     document.title = originalDocumentTitle
-    latestNotificationTimestamp = Date.now()
+    lastNotificationResetTimestamp = Date.now()
 }
 
-function sendNotification(title) {
-    new Notification(`${title}`);
+function sendNotification(text) {
+    new Notification(`${text}`);
     updateCounter(1);
 }
 
@@ -118,7 +118,8 @@ if (notifications == true) {
                     // when a comment is resolved
                     if (payload.resolved && payload.resolved_at && payload.resolved_by_user) {
                         user = payload.resolved_by_user.updated
-                        if (new Date(payload.resolved_at.updated) > latestNotificationTimestamp && !(user.isSelf)) {
+                        // check if this is newer than the last reset and if the user did not do it themselves 
+                        if (new Date(payload.resolved_at.updated) > lastNotificationResetTimestamp && !(user.isSelf)) {
                             sendNotification(`${user.name} resolved a comment`)
                         }
                     }
@@ -141,12 +142,47 @@ if (notifications == true) {
                             }
                         }
                         // check if message was sent after latest timestamp, it is not a self-comment and the contents exist
-                        if (message.timestamp > latestNotificationTimestamp && message.user && message.content && !(message.user.isSelf)) {
+                        if (message.timestamp > lastNotificationResetTimestamp && message.user && message.content && !(message.user.isSelf)) {
                             sendNotification(`${message.user.name} ${actionText}: ${message.content}`)
                         }
                     }
                 }
             }, true);
+        }
+    }
+
+    // set watch on chat
+    if (notifications_chats == true) {
+        chat_scope = angular.element('[class="infinite-scroll messages"]').children().children()
+        if (chat_scope && chat_scope.length && chat_scope[1]) {
+            observer = new MutationObserver(function(mutations) {
+                if (mutations.length) {
+                    mutations = mutations[mutations.length - 1]
+                }
+                // only continue if the mutation was at least two seconds after last reset to avoid sending historical chats
+                if (Date.now() > lastNotificationResetTimestamp + (2*1000)) {
+                    for (const message_index in mutations.addedNodes) {
+                        message = mutations.addedNodes[message_index]
+                        // console.log(message)
+                        if (message.getElementsByClassName) {
+                            // console.log(message.getElementsByClassName("date"))
+                            wrapper = message.getElementsByClassName("message-wrapper")[0]
+                            // there is only a name if the sender is not self
+                            if (wrapper.getElementsByClassName('name').length) {
+                                sendername = wrapper.getElementsByClassName('name')[0].getElementsByTagName('span')[0].innerHTML
+                                contents = wrapper.getElementsByClassName('message')[0].getElementsByClassName('message-content')
+                                last_texts = contents[contents.length - 1].getElementsByTagName('p')
+                                last_text = last_texts[last_texts.length - 1].innerHTML
+                                sendNotification(`${sendername} in chat: ${last_text}`)
+                            }
+                        }
+                    }
+                }
+            });
+            observer.observe(chat_scope[1], {
+                childList: true,
+                subtree: true
+            })
         }
     }
 }
