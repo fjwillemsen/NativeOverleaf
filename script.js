@@ -1,3 +1,9 @@
+// available themes
+editorThemes_light = ['textmate', 'overleaf', 'eclipse']
+editorThemes_dark = ['dracula', 'monokai', 'cobalt']
+overallThemes_light = ['light-']
+overallThemes_dark = ['']
+
 // user preferences
 notifications = true
 notifications_comments = true
@@ -6,11 +12,10 @@ colormode_switching = true
 editortheme_dark = editorThemes_dark[0]
 editortheme_light = editorThemes_light[0]
 
-// available themes
-editorThemes_light = ['textmate', 'overleaf', 'eclipse']
-editorThemes_dark = ['dracula', 'monokai', 'cobalt']
-overallThemes_light = ['light-']
-overallThemes_dark = ['']
+// global variables
+var notificationCounter = 0
+var latestNotificationTimestamp = Date.now()
+const originalDocumentTitle = document.title
 
 function switchColorMode(preference) {
     scope = angular.element('[ng-controller=SettingsController]').scope();
@@ -26,6 +31,32 @@ function switchColorMode(preference) {
     }
 }
 
+function updateCounter(countToAdd) {
+    notificationCounter += countToAdd
+    if (notificationCounter <= 0) {
+        return resetCounter()
+    }
+    const replaceOldCounter = /^(\(\d*\))\W/
+    // test if there is a counter to be replaced
+    if (replaceOldCounter.test(document.title)) {
+        document.title = document.title.replace(replaceOldCounter, `(${notificationCounter}) `)
+    }
+    else {
+        document.title = `(${notificationCounter}) ${originalDocumentTitle}`
+    }
+}
+
+function resetCounter() {
+    notificationCounter = 0
+    document.title = originalDocumentTitle
+    latestNotificationTimestamp = Date.now()
+}
+
+function sendNotification(title) {
+    new Notification(`${title}`);
+    updateCounter(1);
+}
+
 // setup colormode
 if (window.matchMedia) {
     var colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
@@ -36,23 +67,24 @@ if (window.matchMedia) {
         preference = event.matches ? "dark" : "light";
         switchColorMode(preference)
     });
-    // if the URL changes
-    window.addEventListener('popstate', function() { 
-        console.log(window.location.pathname)
-    });
+    // // if the URL changes
+    // // not necessary because this script is executed on each new page
+    // window.addEventListener('popstate', function() { 
+    //     console.log(window.location.pathname)
+    // });
 }
 
 // setup notifications
 if (notifications == true) {
     // check if browser supports notifications
     if (!("Notification" in window)) {
-        alert("This browser does not support desktop notification");
+        alert("This browser does not support notifications");
     }
 
     // Let's check whether notification permissions have already been granted
     else if (Notification.permission === "granted") {
         // If it's okay let's create a notification
-        var notification = new Notification("Hi there!");
+        // sendNotification("Notifications are enabled");
     }
 
     // Otherwise, we need to ask the user for permission
@@ -60,28 +92,46 @@ if (notifications == true) {
         Notification.requestPermission(function (permission) {
             // If the user accepts, let's create a notification
             if (permission === "granted") {
-                var notification = new Notification("Hi there (newly accepted)!");
+                sendNotification("Notifications are now enabled");
             }
         });
     }
-    
 
+    // reset notifications if the window is in focus
+    addEventListener('focus', (event) => {
+        resetCounter()
+    });
+    
+    // set watch on comment threads
     if (notifications_comments == true) {
         comments_scope = angular.element('[ng-controller=ReviewPanelController]').scope();
-        // if there are new comments, find the new ones and emit a notification for it
-        comments_scope.$watch('reviewPanel.commentThreads', function(newVal, oldVal) {
-            diffs = deepDiffMapper.map(oldVal, newVal)
-            console.log(diffs)
-            for (const diff_key in diffs) {
-                messages = diffs[diff_key].messages
-                for (const message_key in messages) {
-                    console.log(messages[message_key])
-
-                    message = messages[message_key].updated
-                    new Notification(message.user.name + ' says: ' + message.content)
+        // if the ReviewPanelController is in scope, set a watcher
+        if (comments_scope) {
+            // if there are new comments, find the new ones and emit a notification for it
+            comments_scope.$watch('reviewPanel.commentThreads', function(newVal, oldVal) {
+                diffs = deepDiffMapper.map(oldVal, newVal)
+                console.log(diffs)
+                for (const diff_key in diffs) {
+                    // unpack payload
+                    var payload = diffs[diff_key]
+                    if (payload.updated) {
+                        payload = payload.updated
+                    }
+                    messages = payload.messages
+                    for (const message_index in messages) {
+                        // unpack message
+                        var message = messages[message_index]
+                        if (message.updated) {
+                            message = message.updated
+                        }
+                        // check if message was sent after latest timestamp, it is not a self-comment and the contents exist
+                        if (message.timestamp > latestNotificationTimestamp && message.user && message.content && !(message.user.isSelf)) {
+                            sendNotification(`${message.user.name} commented: ${message.content}`)
+                        }
+                    }
                 }
-            }
-        }, true);
+            }, true);
+        }
     }
 }
 
