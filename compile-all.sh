@@ -21,7 +21,6 @@ icon="--icon Icon/base_icon.png"
 $basecommand $platform --arch arm64 $icon
 $basecommand $platform --arch armv7l $icon
 $basecommand $platform --arch x64 $icon
-$basecommand $platform --arch ia32 $icon
 
 # Windows
 platform="--platform windows"
