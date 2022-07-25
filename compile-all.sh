@@ -1,15 +1,19 @@
 #!/bin/bash
 name="--name Overleaf"
 destination="Binaries/"
-appversion="--app-version 1.0.0"
+appversionnumber="1.1.0"
+appversion="--app-version $appversionnumber"
+epochtime=$(date +%s)
+buildversion="--build-version $appversionnumber.$epochtime" 
 script="--inject script.js"
-basecommand="nativefier https://overleaf.com $destination $name $appversion $script --overwrite"
+basecommand="nativefier https://overleaf.com $destination $name $appversion $buildversion $script --overwrite"
 
 # Mac
 platform="--platform osx"
 icon="--icon Icon/Mac.icns"
-$basecommand $platform --arch arm64 --darwin-dark-mode-support $icon
-$basecommand $platform --arch x64 --darwin-dark-mode-support $icon
+options="--darwin-dark-mode-support --counter --bounce --fast-quit"
+$basecommand $platform --arch arm64 $options $icon
+$basecommand $platform --arch x64 $options $icon
 
 # Linux
 platform="--platform linux"
