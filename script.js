@@ -7,6 +7,7 @@ overallThemes_dark = ['']
 // user preferences
 notifications = true
 notifications_comments = true
+notifications_comment_threads = true
 notifications_chats = true
 colormode_switching = true
 editortheme_dark = editorThemes_dark[0]
@@ -110,12 +111,23 @@ if (notifications == true) {
             // if there are new comments, find the new ones and emit a notification for it
             comments_scope.$watch('reviewPanel.commentThreads', function(newVal, oldVal) {
                 diffs = deepDiffMapper.map(oldVal, newVal)
-                console.log(diffs)
                 for (const diff_key in diffs) {
                     // unpack payload
                     var payload = diffs[diff_key]
+
+                    // when a comment is resolved
+                    if (payload.resolved && payload.resolved_at && payload.resolved_by_user) {
+                        user = payload.resolved_by_user.updated
+                        if (new Date(payload.resolved_at.updated) > latestNotificationTimestamp && !(user.isSelf)) {
+                            sendNotification(`${user.name} resolved a comment`)
+                        }
+                    }
+
+                    // new comment threads and new comments in a thread use the same structure
+                    var actionText = "responded to a comment"
                     if (payload.updated) {
                         payload = payload.updated
+                        actionText = "commented"
                     }
                     messages = payload.messages
                     for (const message_index in messages) {
@@ -123,10 +135,14 @@ if (notifications == true) {
                         var message = messages[message_index]
                         if (message.updated) {
                             message = message.updated
+                            // if notifications of comment threads are not enabled, skip this message   (TODO check if it is safe to break here?)
+                            if (!(notifications_comment_threads)) {
+                                continue;
+                            }
                         }
                         // check if message was sent after latest timestamp, it is not a self-comment and the contents exist
                         if (message.timestamp > latestNotificationTimestamp && message.user && message.content && !(message.user.isSelf)) {
-                            sendNotification(`${message.user.name} commented: ${message.content}`)
+                            sendNotification(`${message.user.name} ${actionText}: ${message.content}`)
                         }
                     }
                 }
