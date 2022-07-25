@@ -10,8 +10,8 @@ However, would it not be even better if it were to behave like a native app on y
 - [x] notifications of comments and comment threads
 - [x] notifications of chat
 
-<img src="Assets/showcase/notifications/badgecount.png" height="180">
-<img src="Assets/showcase/notifications/notificationcenter_light.png" height="180">
+<img src="Assets/showcase/notifications/badgecount.png">
+<img src="Assets/showcase/notifications/notificationcenter_light.png" width="250">
 
 
 ## To Do
