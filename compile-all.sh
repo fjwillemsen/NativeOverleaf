@@ -30,10 +30,13 @@ $basecommand $platform --arch x64 $icon
 $basecommand $platform --arch ia32 $icon
 
 # Zipping
+echo
+echo "--------"
 cd $destination
 for d in */ ; do
-    target="${d%?}.zip"
+    target="${d%?}.zip"         # remove the / at the end of the folder name
     echo "Zipping $d to $target"
-    zip -r -X -o $target $d
+    ditto -c -k --sequesterRsrc --keepParent $d $target
+    # zip -r -X -o $target $d   # ditto is much more efficient for zipping Mac applications
 done
 cd ..
