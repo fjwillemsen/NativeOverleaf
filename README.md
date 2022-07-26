@@ -59,7 +59,7 @@ In just four easy steps you can compile Overleaf as a native app for your device
 - Step 1: open your terminal and `cd` to wherever you want to install Overleaf. 
 - Step 2: download this repository (e.g. `git clone https://github.com/fjwillemsen/NativeOverleaf.git`).
 - Step 3: install nativefier, for example using `brew install nativefier`. 
-- Step 4: run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. 
+- Step 4: use the `compile-all.sh` script for inspiration or run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. 
 
 After being built, the app appears in the folder - you can copy it to another location if desired. 
 
