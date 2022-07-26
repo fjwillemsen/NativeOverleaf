@@ -1,7 +1,7 @@
 #!/bin/bash
 name="--name Overleaf"
 destination="Binaries/"
-appversionnumber="1.1.0"
+appversionnumber="1.2.0"
 appversion="--app-version $appversionnumber"
 epochtime=$(date +%s)
 buildversion="--build-version $appversionnumber.$epochtime" 
@@ -28,3 +28,12 @@ icon="--icon Icons/Windows.ico"
 $basecommand $platform --arch arm64 $icon
 $basecommand $platform --arch x64 $icon
 $basecommand $platform --arch ia32 $icon
+
+# Zipping
+cd $destination
+for d in */ ; do
+    target="${d%?}.zip"
+    echo "Zipping $d to $target"
+    zip -r -X -o $target $d
+done
+cd ..
