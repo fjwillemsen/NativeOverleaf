@@ -9,26 +9,30 @@ However, would it not be even better if it were to behave like a native app on y
 - [x] system-based dark / light mode switching 
 - [x] notifications of comments and comment threads
 - [x] notifications of chat
+- [x] preferences pane integrated in the Overleaf menu
 
-<img src="Assets/showcase/notifications/badgecount.png">
-<img src="Assets/showcase/notifications/notificationcenter_light.png" width="250">
+<img src="Assets/showcase/notifications/badgecount.png" alt="notification badgecount">
+<img src="Assets/showcase/notifications/notificationcenter_light.png" width="250" alt="notification center showcase">
+<img src="Assets/showcase/preferences/preferences_pane_extended.png" width="200" alt="preferences pane">
 
 
 ## To Do
-- [ ] preferences pane (planned for next version)
-- [ ] automated local backups of projects (planned for future version)
+- [ ] automated local backups of projects (planned for next version)
+- [ ] notifications for tracked changes (planned for future version)
+- [ ] restructure to keep script.js manageable
 
 [Looking to contribute?](#ideas-questions-contributions)
 
 ## Tips
+- The preferences pane can be found in the normal Overleaf menu. 
 - You can run multiple instances of Native Overleaf, allowing you to keep multiple projects open at the same time and receive notifications for each project. 
-- Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the background, so you will not get notifications while working in a project.
+- Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the background, so you will not get notifications while working in a project. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
 
 ## How it works
 Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native feature with a large number of supported platforms. 
 
 ## Download binary
-If there is interest in this project, I will create add it to Homebrew for easy updates. 
+If there is interest in this project, I will add it to Homebrew for easy updates. 
 For now, the following binaries have been precompiled and can be downloaded directly:
 
 ### **Mac**
