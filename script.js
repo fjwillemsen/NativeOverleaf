@@ -13,14 +13,18 @@ up_colormode_switching = JSON.parse(localStorage.getItem('colormode_switching'))
 up_editortheme_dark = JSON.parse(localStorage.getItem('editortheme_dark')) || editorThemes_dark[0];
 up_editortheme_light = JSON.parse(localStorage.getItem('editortheme_light')) || editorThemes_light[0];
 
-console.log(up_colormode_switching)
+// register links to watchers for removal / reactivation
+var comments_watcher_unbind
+var chat_observer
+var colorscheme
 
 // global variables
 var notificationCounter = 0
 var lastNotificationResetTimestamp = Date.now()
 const originalDocumentTitle = document.title
 if (window.matchMedia) {
-    var current_colorscheme_preference = window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
+    colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
+    var current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
 }
 
 // prevent the document (window) title from being overwritten by Overleaf when a new message comes in
@@ -68,7 +72,7 @@ function updateCounter(countToAdd) {
     }
 }
 
-function resetCounter() {
+function resetCounter(event) {
     notificationCounter = 0
     document.title = originalDocumentTitle
     lastNotificationResetTimestamp = Date.now()
@@ -80,26 +84,28 @@ function sendNotification(text) {
 }
 
 // setup colormode
+function autoChangeColorMode(event) {
+    current_colorscheme_preference = event.matches ? "dark" : "light";
+    switchColorMode()
+} 
 function setupColormode() {
-    if (window.matchMedia && up_colormode_switching == true) {
+    if (colorscheme !== undefined && up_colormode_switching == true) {
         switchColorMode()
-        var colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
         // if the colorscheme changes
-        colorscheme.addEventListener('change', event => {
-            current_colorscheme_preference = event.matches ? "dark" : "light";
-            switchColorMode()
-        });
-        // // if the URL changes
-        // // not necessary because this script is executed on each new page
-        // window.addEventListener('popstate', function() { 
-        //     console.log(window.location.pathname)
-        // });
+        colorscheme.addEventListener('change', autoChangeColorMode, true);
+    }
+}
+function destructColormode() {
+    if (colorscheme !== undefined && up_colormode_switching == false) {
+        colorscheme.removeEventListener('change', autoChangeColorMode, true);
     }
 }
 
 // setup notifications
 function setupNotifications() {
-    if (up_notifications == true) {
+    // first check if notifications are used at all before setting up
+    const any_notifications_used = up_notifications_chats == true || up_notifications_comments == true || up_notifications_comment_threads == true
+    if (up_notifications == true && any_notifications_used == true) {
         // check if browser supports notifications
         if (!("Notification" in window)) {
             alert("This browser does not support notifications");
@@ -122,9 +128,7 @@ function setupNotifications() {
         }
 
         // reset notifications if the window is in focus
-        addEventListener('focus', (event) => {
-            resetCounter()
-        });
+        addEventListener('focus', resetCounter);
         
         // set watch on comment threads
         if (up_notifications_comments == true) {
@@ -132,7 +136,10 @@ function setupNotifications() {
             // if the ReviewPanelController is in scope, set a watcher
             if (comments_scope) {
                 // if there are new comments, find the new ones and emit a notification for it
-                comments_scope.$watch('reviewPanel.commentThreads', function(newVal, oldVal) {
+                if (comments_watcher_unbind !== undefined) {
+                    throw "comments_watcher_unbind should be undefined at this point"
+                }
+                comments_watcher_unbind = comments_scope.$watch('reviewPanel.commentThreads', function(newVal, oldVal) {
                     diffs = deepDiffMapper.map(oldVal, newVal)
                     for (const diff_key in diffs) {
                         // unpack payload
@@ -178,35 +185,47 @@ function setupNotifications() {
         if (up_notifications_chats == true) {
             chat_scope = angular.element('[class="infinite-scroll messages"]').children().children()
             if (chat_scope && chat_scope.length && chat_scope[1]) {
-                observer = new MutationObserver(function(mutations) {
-                    if (mutations.length) {
-                        mutations = mutations[mutations.length - 1]
-                    }
-                    // only continue if the mutation was at least two seconds after last reset to avoid sending historical chats
-                    if (Date.now() > lastNotificationResetTimestamp + (2*1000)) {
-                        for (const message_index in mutations.addedNodes) {
-                            message = mutations.addedNodes[message_index]
-                            if (message.getElementsByClassName) {
-                                wrapper = message.getElementsByClassName("message-wrapper")[0]
-                                // there is only a name if the sender is not self
-                                if (wrapper.getElementsByClassName('name').length) {
-                                    sendername = wrapper.getElementsByClassName('name')[0].getElementsByTagName('span')[0].innerHTML
-                                    contents = wrapper.getElementsByClassName('message')[0].getElementsByClassName('message-content')
-                                    last_texts = contents[contents.length - 1].getElementsByTagName('p')
-                                    last_text = last_texts[last_texts.length - 1].innerHTML
-                                    sendNotification(`${sendername} in chat: ${last_text}`)
+                if (chat_observer === undefined) {
+                    chat_observer = new MutationObserver(function(mutations) {
+                        if (mutations.length) {
+                            mutations = mutations[mutations.length - 1]
+                        }
+                        // only continue if the mutation was at least two seconds after last reset to avoid sending historical chats
+                        if (Date.now() > lastNotificationResetTimestamp + (2*1000)) {
+                            for (const message_index in mutations.addedNodes) {
+                                message = mutations.addedNodes[message_index]
+                                if (message.getElementsByClassName) {
+                                    wrapper = message.getElementsByClassName("message-wrapper")[0]
+                                    // there is only a name if the sender is not self
+                                    if (wrapper.getElementsByClassName('name').length) {
+                                        sendername = wrapper.getElementsByClassName('name')[0].getElementsByTagName('span')[0].innerHTML
+                                        contents = wrapper.getElementsByClassName('message')[0].getElementsByClassName('message-content')
+                                        last_texts = contents[contents.length - 1].getElementsByTagName('p')
+                                        last_text = last_texts[last_texts.length - 1].innerHTML
+                                        sendNotification(`${sendername} in chat: ${last_text}`)
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-                observer.observe(chat_scope[1], {
+                    });
+                }
+                chat_observer.observe(chat_scope[1], {
                     childList: true,
                     subtree: true
                 })
             }
         }
     }
+}
+function destructNotifications() {
+    if (comments_watcher_unbind !== undefined) {
+        comments_watcher_unbind()
+        comments_watcher_unbind = undefined
+    }
+    if (chat_observer !== undefined) {
+        chat_observer.disconnect()
+    }
+    removeEventListener('focus', resetCounter)
 }
 
 function getThemesHTML(array) {
@@ -292,6 +311,9 @@ function set_notifications_chat(key, value, _) {
     if (value != up_notifications_chats) {
         up_notifications_chats = value.checked
         localStorage.setItem(key, JSON.stringify(value.checked))
+        // register the eventlisteners again
+        destructNotifications()
+        setupNotifications()
     }
 };
 
@@ -299,6 +321,9 @@ function set_notifications_comment(key, value, _) {
     if (value.checked != up_notifications_comments) {
         up_notifications_comments = value.checked
         localStorage.setItem(key, JSON.stringify(value.checked))
+        // register the eventlisteners again
+        destructNotifications()
+        setupNotifications()
     }
 };
 
@@ -306,6 +331,9 @@ function set_notifications_comment_response(key, value, _) {
     if (value.checked != up_notifications_comment_threads) {
         up_notifications_comment_threads = value.checked
         localStorage.setItem(key, JSON.stringify(value.checked))
+        // register the eventlisteners again
+        destructNotifications()
+        setupNotifications()
     }
 };
 
@@ -315,6 +343,13 @@ function set_colormode_switching(key, value, _) {
         localStorage.setItem(key, JSON.stringify(value.checked))
         settings_form.querySelector('#editortheme_dark').disabled = !(up_colormode_switching)
         settings_form.querySelector('#editortheme_light').disabled = !(up_colormode_switching)
+        if (up_colormode_switching == true) {
+            // register the event listener again
+            setupColormode()
+        } else {
+            // remove the event listener
+            destructColormode()
+        }
     }
 };
 
