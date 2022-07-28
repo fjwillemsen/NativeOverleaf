@@ -39,9 +39,11 @@ if (window.matchMedia) {
 <<insert="notificationsbadge.js">>
 <<insert="preferences.js">>
 <<insert="css.js">>
+<<insert="update.js">>
 
 // start
 setupColormode()
 setupNotifications()
 setupPreferencesPane()
 addCSS()
+setAutoUpdateChecking()
