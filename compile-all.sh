@@ -1,40 +1,60 @@
 #!/bin/bash
+echo
 
 # bundle all scripts by replacing insert statements with file contents
 cd Scripts
+echo "Bundling scripts"
 /bin/bash bundle_scripts.sh
+echo
 cd ..
 
 # Setup variables
+echo
+echo "--------"
 name="--name Overleaf"
 destination="Binaries/"
-appversionnumber=$(cat Scripts/appversion.js | grep -o "\".*\"")
+appversionnumber=$(cat Scripts/appversion.js | grep -o ".\..\..")
 appversion="--app-version $appversionnumber"
 epochtime=$(date +%s)
 buildversion="--build-version $appversionnumber.$epochtime" 
 script="--inject bundled_script.js"
 basecommand="nativefier https://overleaf.com $destination $name $appversion $buildversion $script --overwrite"
 
+# function to compile while filtering the nativefier output so only relevant output remains
+function compile() {
+    # read in "named" arguments
+    _platform="--platform $1"
+    _arch="--arch $2"
+    _icon="--icon $3"
+    # read in remaining arguments as options string
+    shift 3
+    _options="${@:-""}"
+    echo "Compiling with '$_platform $_arch $_icon $_options'"
+    $basecommand $_platform $_arch $_icon $_options 2>&1 | grep -v "Hi! Nativefier is minimally maintained" | grep -v "If you have the time" | grep -v "Please go to" | grep -v "Processing options..." | grep -v "Preparing Electron app..." | grep -v "Converting icons..." | grep -v "Packaging...* cached yet..." | grep -v "Finalizing build..." | grep -v "App built to " | grep -v "Menu/desktop shortcuts are" | grep -v '^$'
+    echo
+    shift $#
+}
+
 # Mac
-platform="--platform osx"
-icon="--icon Icons/Mac.icns"
+platform="osx"
+icon="Icons/Mac.icns"
 options="--darwin-dark-mode-support --counter --bounce --fast-quit"
-$basecommand $platform --arch arm64 $options $icon
-$basecommand $platform --arch x64 $options $icon
+compile $platform "arm64" $icon $options
+compile $platform "x64" $icon $options
 
 # Linux
-platform="--platform linux"
-icon="--icon Icons/base_icon.png"
-$basecommand $platform --arch arm64 $icon
-$basecommand $platform --arch armv7l $icon
-$basecommand $platform --arch x64 $icon
+platform="linux"
+icon="Icons/base_icon.png"
+compile $platform "arm64" $icon
+compile $platform "armv7l" $icon
+compile $platform "x64" $icon
 
 # Windows
-platform="--platform windows"
-icon="--icon Icons/Windows.ico"
-$basecommand $platform --arch arm64 $icon
-$basecommand $platform --arch x64 $icon
-$basecommand $platform --arch ia32 $icon
+platform="windows"
+icon="Icons/Windows.ico"
+compile $platform "arm64" $icon
+compile $platform "x64" $icon
+compile $platform "ia32" $icon
 
 # Zipping
 echo
