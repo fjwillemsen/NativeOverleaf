@@ -12,9 +12,11 @@ However, would it not be even better if it were to behave like a native app on y
 - [x] preferences pane integrated in the Overleaf sidemenu
 - [x] automatic update checking
 
-<img src="Assets/showcase/notifications/badgecount.png" alt="notification badgecount">
-<img src="Assets/showcase/notifications/notificationcenter_light.png" width="250" alt="notification center showcase">
-<img src="Assets/showcase/preferences/preferences_pane_extended.png" width="200" alt="preferences pane">
+<p float="left">
+    <img src="Assets/showcase/notifications/badgecount.png" alt="notification badgecount">
+    <img src="Assets/showcase/notifications/notificationcenter_light.png" width="250" alt="notification center showcase">
+    <img src="Assets/showcase/preferences/preferences_pane_extended.png" width="200" alt="preferences pane">
+</p>
 
 
 ## To Do
