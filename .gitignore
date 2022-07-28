@@ -1,5 +1,8 @@
 Binaries/
 
+*.mov
+*.mp4
+
 
 # Generated
 # Created by https://www.toptal.com/developers/gitignore/api/macos,angular,linux,windows
@@ -109,4 +112,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,angular,linux,windows
-Icon
+Icon

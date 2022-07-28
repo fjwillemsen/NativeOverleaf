@@ -2,13 +2,14 @@
 Overleaf is a fantastic webtool for writing and cooperating LaTeX documents. 
 However, would it not be even better if it were to behave like a native app on your system? 
 
+![switching between system light and dark mode](Assets/showcase/darkmode/switching.gif)
+
 [Download directly for your system below](#download-binary)!
 
 ## Features
 - [x] standalone native application
 - [x] system-based dark / light mode switching 
-- [x] notifications of comments and comment threads
-- [x] notifications of chat
+- [x] notifications of chats, comments and comment threads
 - [x] preferences pane integrated in the Overleaf sidemenu
 - [x] automatic update checking
 
@@ -19,7 +20,7 @@ However, would it not be even better if it were to behave like a native app on y
 </p>
 
 
-## To Do
+## Next Features
 - [ ] automated local backups of projects (planned for next version)
 - [ ] notifications for tracked changes (planned for future version)
 
