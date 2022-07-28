@@ -347,7 +347,8 @@ function setupPreferencesPane() {
     settings_html = `
         <h4>Native Overleaf</h4>
         <div class="containter-fluid">
-            <p>View <a href="https://github.com/fjwillemsen/NativeOverleaf">Native Overleaf on GitHub</a></p>
+            <p>Version <a href="https://github.com/fjwillemsen/NativeOverleaf/releases/latest"><i>${appversion}</i></a> - View <a href="https://github.com/fjwillemsen/NativeOverleaf">Native Overleaf on GitHub</a>
+            </p>
             <form id="native-overleaf-settings" class="settings">
                 <h6>Notifications</h6>
                 <label class="settings-toggle">
