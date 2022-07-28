@@ -1,3 +1,5 @@
+// This file acts as a template where the contents of other files (mostly JS scripts) can be inserted using <<insert ="file">> (note the double quotes), compiled into bundled_script.js
+
 // available themes
 editorThemes_light = ['textmate', 'overleaf', 'eclipse']
 editorThemes_dark = ['dracula', 'monokai', 'cobalt']
@@ -18,6 +20,10 @@ var comments_watcher_unbind
 var chat_observer
 var colorscheme
 
+// get app version
+// Contents Inserted from appversion.js
+const appversion = "1.2.1"
+
 // global variables
 var notificationCounter = 0
 var lastNotificationResetTimestamp = Date.now()
@@ -27,19 +33,101 @@ if (window.matchMedia) {
     var current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
 }
 
-// prevent the document (window) title from being overwritten by Overleaf when a new message comes in
-Object.defineProperty(document, 'title', {
-    set: function (newValue) {
-        if(newValue != "" && newValue != "New Message"){
-            document.getElementsByTagName("title")[0].innerHTML = newValue;
+// insert partial files
+// Contents Inserted from util.js
+// This file is not intended to run by itself, but is inserted into main.js
+
+var deepDiffMapper = function () {
+    return {
+        VALUE_CREATED: 'created',
+        VALUE_UPDATED: 'updated',
+        VALUE_DELETED: 'deleted',
+        VALUE_UNCHANGED: '---',
+        map: function (obj1, obj2) {
+            if (this.isFunction(obj1) || this.isFunction(obj2)) {
+                throw 'Invalid argument. Function given, object expected.';
+            }
+            if (this.isValue(obj1) || this.isValue(obj2)) {
+                let returnObj = {
+                    type: this.compareValues(obj1, obj2),
+                    original: obj1,
+                    updated: obj2,
+                };
+                if (returnObj.type != this.VALUE_UNCHANGED) {
+                    return returnObj;
+                }
+                return undefined;
+            }
+
+            var diff = {};
+            let foundKeys = {};
+            for (var key in obj1) {
+                if (this.isFunction(obj1[key])) {
+                    continue;
+                }
+
+                var value2 = undefined;
+                if (obj2[key] !== undefined) {
+                    value2 = obj2[key];
+                }
+
+                let mapValue = this.map(obj1[key], value2);
+                foundKeys[key] = true;
+                if (mapValue) {
+                    diff[key] = mapValue;
+                }
+            }
+            for (var key in obj2) {
+                if (this.isFunction(obj2[key]) || foundKeys[key] !== undefined) {
+                    continue;
+                }
+
+                let mapValue = this.map(undefined, obj2[key]);
+                if (mapValue) {
+                    diff[key] = mapValue;
+                }
+            }
+
+            //2020-06-13: object length code copied from https://stackoverflow.com/a/13190981/2336212
+            if (Object.keys(diff).length > 0) {
+                return diff;
+            }
+            return undefined;
+        },
+        compareValues: function (value1, value2) {
+            if (value1 === value2) {
+                return this.VALUE_UNCHANGED;
+            }
+            if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
+                return this.VALUE_UNCHANGED;
+            }
+            if (value1 === undefined) {
+                return this.VALUE_CREATED;
+            }
+            if (value2 === undefined) {
+                return this.VALUE_DELETED;
+            }
+            return this.VALUE_UPDATED;
+        },
+        isFunction: function (x) {
+            return Object.prototype.toString.call(x) === '[object Function]';
+        },
+        isArray: function (x) {
+            return Object.prototype.toString.call(x) === '[object Array]';
+        },
+        isDate: function (x) {
+            return Object.prototype.toString.call(x) === '[object Date]';
+        },
+        isObject: function (x) {
+            return Object.prototype.toString.call(x) === '[object Object]';
+        },
+        isValue: function (x) {
+            return !this.isObject(x) && !this.isArray(x);
         }
-    },
-});
-
-// start setup
-setupColormode()
-setupNotifications()
-
+    }
+}();
+// Contents Inserted from colormode.js
+// This file is not intended to run by itself, but is inserted into main.js
 
 function switchColorMode() {
     scope = angular.element('[ng-controller=SettingsController]').scope();
@@ -55,32 +143,6 @@ function switchColorMode() {
         }
         scope.$apply();
     }
-}
-
-function updateCounter(countToAdd) {
-    notificationCounter += countToAdd
-    if (notificationCounter <= 0) {
-        return resetCounter()
-    }
-    const replaceOldCounter = /^(\(\d*\))\W/
-    // test if there is a counter to be replaced
-    if (replaceOldCounter.test(document.title)) {
-        document.title = document.title.replace(replaceOldCounter, `(${notificationCounter}) `)
-    }
-    else {
-        document.title = `(${notificationCounter}) ${originalDocumentTitle}`
-    }
-}
-
-function resetCounter(event) {
-    notificationCounter = 0
-    document.title = originalDocumentTitle
-    lastNotificationResetTimestamp = Date.now()
-}
-
-function sendNotification(text) {
-    new Notification(`${text}`);
-    updateCounter(1);
 }
 
 // setup colormode
@@ -99,6 +161,13 @@ function destructColormode() {
     if (colorscheme !== undefined && up_colormode_switching == false) {
         colorscheme.removeEventListener('change', autoChangeColorMode, true);
     }
+}
+// Contents Inserted from notifications.js
+// This file is not intended to run by itself, but is inserted into main.js
+
+function sendNotification(text) {
+    new Notification(`${text}`);
+    updateCounter(1);
 }
 
 // setup notifications
@@ -217,6 +286,7 @@ function setupNotifications() {
         }
     }
 }
+
 function destructNotifications() {
     if (comments_watcher_unbind !== undefined) {
         comments_watcher_unbind()
@@ -227,6 +297,41 @@ function destructNotifications() {
     }
     removeEventListener('focus', resetCounter)
 }
+// Contents Inserted from notificationsbadge.js
+// This file is not intended to run by itself, but is inserted into main.js
+
+// prevent the document (window) title from being overwritten by Overleaf when a new message comes in
+Object.defineProperty(document, 'title', {
+    set: function (newValue) {
+        if(newValue != "" && newValue != "New Message"){
+            document.getElementsByTagName("title")[0].innerHTML = newValue;
+        }
+    },
+});
+
+// update the counter by setting the window title to "(counter) "
+function updateCounter(countToAdd) {
+    notificationCounter += countToAdd
+    if (notificationCounter <= 0) {
+        return resetCounter()
+    }
+    const replaceOldCounter = /^(\(\d*\))\W/
+    // test if there is a counter to be replaced
+    if (replaceOldCounter.test(document.title)) {
+        document.title = document.title.replace(replaceOldCounter, `(${notificationCounter}) `)
+    }
+    else {
+        document.title = `(${notificationCounter}) ${originalDocumentTitle}`
+    }
+}
+
+function resetCounter(event) {
+    notificationCounter = 0
+    document.title = originalDocumentTitle
+    lastNotificationResetTimestamp = Date.now()
+}
+// Contents Inserted from preferences.js
+// This file is not intended to run by itself, but is inserted into main.js
 
 function getThemesHTML(array) {
     var str = ""
@@ -238,63 +343,65 @@ function getThemesHTML(array) {
 }
 
 // settings menu pane
-settings_html = `
-    <h4>Native Overleaf</h4>
-    <div class="containter-fluid">
-        <p>View <a href="https://github.com/fjwillemsen/NativeOverleaf">Native Overleaf on GitHub</a></p>
-        <form id="native-overleaf-settings" class="settings">
-            <h6>Notifications</h6>
-            <label class="settings-toggle">
-                <input id="notifications_chat" class="settings-toggle-checkbox" type="checkbox">
-                <div class="settings-toggle-switch"></div>
-                <span class="settings-toggle-label">Chat messages</span>
-            </label>
-            <br/>
-            <label class="settings-toggle">
-                <input id="notifications_comment" class="settings-toggle-checkbox" type="checkbox">
-                <div class="settings-toggle-switch"></div>
-                <span class="settings-toggle-label">Comments</span>
-            </label>
-            <br/>
-            <label class="settings-toggle">
-                <input id="notifications_comment_response" class="settings-toggle-checkbox" type="checkbox">
-                <div class="settings-toggle-switch"></div>
-                <span class="settings-toggle-label">Comment threads</span>
-            </label>
-            <hr/>
-            <h6>Dark / Light Mode</h6>
-            <label class="settings-toggle">
-                <input id="colormode_switching" class="settings-toggle-checkbox" type="checkbox">
-                <div class="settings-toggle-switch"></div>
-                <span class="settings-toggle-label">Follow system</span>
-            </label>
-            <br/>
-            <label for="editortheme_light">Editor light mode</label>
-            <select id="editortheme_light">
-                ${getThemesHTML(editorThemes_light)}
-            </select>
-            <label for="editortheme_dark">Editor dark mode</label>
-            <select id="editortheme_dark">
-                ${getThemesHTML(editorThemes_dark)}
-            </select>
-        </div>
-    </form>`;
-if (document.querySelector('#left-menu')) {
-    document.querySelector('#left-menu').getElementsByTagName('form')[0].insertAdjacentHTML('afterend', settings_html)
-    settings_form = document.querySelector('#native-overleaf-settings')
-    // load settings
-    settings_form.querySelector('#notifications_chat').checked = up_notifications_chats;
-    settings_form.querySelector('#notifications_comment').checked = up_notifications_comments;
-    settings_form.querySelector('#notifications_comment_response').checked = up_notifications_comment_threads;
-    settings_form.querySelector('#colormode_switching').checked = up_colormode_switching;
-    settings_form.querySelector('#editortheme_dark').value = up_editortheme_dark;
-    settings_form.querySelector('#editortheme_light').value = up_editortheme_light;
-    // listen for changes and trigger setting change handlers
-    settings_form.addEventListener('change', function() {
-        for (var id_key in settings_handler) {
-            settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`))
-        }
-    });
+function setupPreferencesPane() {
+    settings_html = `
+        <h4>Native Overleaf</h4>
+        <div class="containter-fluid">
+            <p>View <a href="https://github.com/fjwillemsen/NativeOverleaf">Native Overleaf on GitHub</a></p>
+            <form id="native-overleaf-settings" class="settings">
+                <h6>Notifications</h6>
+                <label class="settings-toggle">
+                    <input id="notifications_chat" class="settings-toggle-checkbox" type="checkbox">
+                    <div class="settings-toggle-switch"></div>
+                    <span class="settings-toggle-label">Chat messages</span>
+                </label>
+                <br/>
+                <label class="settings-toggle">
+                    <input id="notifications_comment" class="settings-toggle-checkbox" type="checkbox">
+                    <div class="settings-toggle-switch"></div>
+                    <span class="settings-toggle-label">Comments</span>
+                </label>
+                <br/>
+                <label class="settings-toggle">
+                    <input id="notifications_comment_response" class="settings-toggle-checkbox" type="checkbox">
+                    <div class="settings-toggle-switch"></div>
+                    <span class="settings-toggle-label">Comment threads</span>
+                </label>
+                <hr/>
+                <h6>Dark / Light Mode</h6>
+                <label class="settings-toggle">
+                    <input id="colormode_switching" class="settings-toggle-checkbox" type="checkbox">
+                    <div class="settings-toggle-switch"></div>
+                    <span class="settings-toggle-label">Follow system</span>
+                </label>
+                <br/>
+                <label for="editortheme_light">Editor light mode</label>
+                <select id="editortheme_light">
+                    ${getThemesHTML(editorThemes_light)}
+                </select>
+                <label for="editortheme_dark">Editor dark mode</label>
+                <select id="editortheme_dark">
+                    ${getThemesHTML(editorThemes_dark)}
+                </select>
+            </div>
+        </form>`;
+    if (document.querySelector('#left-menu')) {
+        document.querySelector('#left-menu').getElementsByTagName('form')[0].insertAdjacentHTML('afterend', settings_html)
+        settings_form = document.querySelector('#native-overleaf-settings')
+        // load settings
+        settings_form.querySelector('#notifications_chat').checked = up_notifications_chats;
+        settings_form.querySelector('#notifications_comment').checked = up_notifications_comments;
+        settings_form.querySelector('#notifications_comment_response').checked = up_notifications_comment_threads;
+        settings_form.querySelector('#colormode_switching').checked = up_colormode_switching;
+        settings_form.querySelector('#editortheme_dark').value = up_editortheme_dark;
+        settings_form.querySelector('#editortheme_light').value = up_editortheme_light;
+        // listen for changes and trigger setting change handlers
+        settings_form.addEventListener('change', function() {
+            for (var id_key in settings_handler) {
+                settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`))
+            }
+        });
+    }
 }
 
 // setting handlers
@@ -368,159 +475,72 @@ function set_editortheme_light(key, value) {
         switchColorMode()
     }
 };
-
+// Contents Inserted from css.js
+// This file is not intended to run by itself, but is inserted into main.js
 
 // inserting CSS
-const css_text = `
-    .native-overleaf-settings {
-        display: inline-block;
-        width: 260px;
-    }
-
-    .settings-toggle {
-        cursor: pointer;
-        display: inline-block;
-    }
-    .settings-toggle-switch {
-        display: inline-block;
-        background: #2e3644;
-        border-radius: 16px;
-        width: 58px;
-        height: 32px;
-        position: relative;
-        vertical-align: middle;
-        transition: background 0.25s;
-    }
-    .settings-toggle-switch:before, .settings-toggle-switch:after {
-        content: "";
-    }
-    .settings-toggle-switch:before {
-        display: block;
-        background: linear-gradient(to bottom, #fff 0%, #eee 100%);
-        border-radius: 50%;
-        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        transition: left 0.25s;
-    }
-    .settings-toggle:hover .settings-toggle-switch:before {
-        background: linear-gradient(to bottom, #fff 0%, #fff 100%);
-        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
-    }
-    .settings-toggle-checkbox:checked + .settings-toggle-switch {
-        background: #408827;
-    }
-    .settings-toggle-checkbox:checked + .settings-toggle-switch:before {
-        left: 30px;
-    }
-    .settings-toggle-checkbox {
-        position: absolute;
-        visibility: hidden;
-    }
-    .settings-toggle-label {
-        margin-left: 5px;
-        position: relative;
-        top: 2px;
-    }
-`;
-var styleSheet = document.createElement("style")
-styleSheet.innerText = css_text
-document.head.appendChild(styleSheet)
-
-
-
-// Utility functions
-
-
-var deepDiffMapper = function () {
-    return {
-        VALUE_CREATED: 'created',
-        VALUE_UPDATED: 'updated',
-        VALUE_DELETED: 'deleted',
-        VALUE_UNCHANGED: '---',
-        map: function (obj1, obj2) {
-            if (this.isFunction(obj1) || this.isFunction(obj2)) {
-                throw 'Invalid argument. Function given, object expected.';
-            }
-            if (this.isValue(obj1) || this.isValue(obj2)) {
-                let returnObj = {
-                    type: this.compareValues(obj1, obj2),
-                    original: obj1,
-                    updated: obj2,
-                };
-                if (returnObj.type != this.VALUE_UNCHANGED) {
-                    return returnObj;
-                }
-                return undefined;
-            }
-
-            var diff = {};
-            let foundKeys = {};
-            for (var key in obj1) {
-                if (this.isFunction(obj1[key])) {
-                    continue;
-                }
-
-                var value2 = undefined;
-                if (obj2[key] !== undefined) {
-                    value2 = obj2[key];
-                }
-
-                let mapValue = this.map(obj1[key], value2);
-                foundKeys[key] = true;
-                if (mapValue) {
-                    diff[key] = mapValue;
-                }
-            }
-            for (var key in obj2) {
-                if (this.isFunction(obj2[key]) || foundKeys[key] !== undefined) {
-                    continue;
-                }
-
-                let mapValue = this.map(undefined, obj2[key]);
-                if (mapValue) {
-                    diff[key] = mapValue;
-                }
-            }
-
-            //2020-06-13: object length code copied from https://stackoverflow.com/a/13190981/2336212
-            if (Object.keys(diff).length > 0) {
-                return diff;
-            }
-            return undefined;
-        },
-        compareValues: function (value1, value2) {
-            if (value1 === value2) {
-                return this.VALUE_UNCHANGED;
-            }
-            if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
-                return this.VALUE_UNCHANGED;
-            }
-            if (value1 === undefined) {
-                return this.VALUE_CREATED;
-            }
-            if (value2 === undefined) {
-                return this.VALUE_DELETED;
-            }
-            return this.VALUE_UPDATED;
-        },
-        isFunction: function (x) {
-            return Object.prototype.toString.call(x) === '[object Function]';
-        },
-        isArray: function (x) {
-            return Object.prototype.toString.call(x) === '[object Array]';
-        },
-        isDate: function (x) {
-            return Object.prototype.toString.call(x) === '[object Date]';
-        },
-        isObject: function (x) {
-            return Object.prototype.toString.call(x) === '[object Object]';
-        },
-        isValue: function (x) {
-            return !this.isObject(x) && !this.isArray(x);
+function addCSS() {
+    const css_text = `
+        .native-overleaf-settings {
+            display: inline-block;
+            width: 260px;
         }
-    }
-}();
+
+        .settings-toggle {
+            cursor: pointer;
+            display: inline-block;
+        }
+        .settings-toggle-switch {
+            display: inline-block;
+            background: #2e3644;
+            border-radius: 16px;
+            width: 58px;
+            height: 32px;
+            position: relative;
+            vertical-align: middle;
+            transition: background 0.25s;
+        }
+        .settings-toggle-switch:before, .settings-toggle-switch:after {
+            content: "";
+        }
+        .settings-toggle-switch:before {
+            display: block;
+            background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            transition: left 0.25s;
+        }
+        .settings-toggle:hover .settings-toggle-switch:before {
+            background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+        }
+        .settings-toggle-checkbox:checked + .settings-toggle-switch {
+            background: #408827;
+        }
+        .settings-toggle-checkbox:checked + .settings-toggle-switch:before {
+            left: 30px;
+        }
+        .settings-toggle-checkbox {
+            position: absolute;
+            visibility: hidden;
+        }
+        .settings-toggle-label {
+            margin-left: 5px;
+            position: relative;
+            top: 2px;
+        }
+    `;
+    var styleSheet = document.createElement("style")
+    styleSheet.innerText = css_text
+    document.head.appendChild(styleSheet)
+}
+// start
+setupColormode()
+setupNotifications()
+setupPreferencesPane()
+addCSS()

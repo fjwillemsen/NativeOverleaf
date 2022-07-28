@@ -17,9 +17,9 @@ However, would it not be even better if it were to behave like a native app on y
 
 
 ## To Do
+- [ ] updates checker
 - [ ] automated local backups of projects (planned for next version)
 - [ ] notifications for tracked changes (planned for future version)
-- [ ] restructure to keep script.js manageable
 
 [Looking to contribute?](#ideas-questions-contributions)
 

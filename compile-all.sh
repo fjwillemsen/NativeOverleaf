@@ -1,11 +1,18 @@
 #!/bin/bash
+
+# bundle all scripts by replacing insert statements with file contents
+cd Scripts
+/bin/bash bundle_scripts.sh
+cd ..
+
+# Setup variables
 name="--name Overleaf"
 destination="Binaries/"
-appversionnumber="1.2.0"
+appversionnumber=$(cat Scripts/appversion.js | grep -o "\".*\"")
 appversion="--app-version $appversionnumber"
 epochtime=$(date +%s)
 buildversion="--build-version $appversionnumber.$epochtime" 
-script="--inject script.js"
+script="--inject bundled_script.js"
 basecommand="nativefier https://overleaf.com $destination $name $appversion $buildversion $script --overwrite"
 
 # Mac
