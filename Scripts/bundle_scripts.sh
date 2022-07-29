@@ -7,7 +7,7 @@ inserts=$(cat main.js | grep -o "<<insert=.*>>")
 for insert in $inserts
 do 
     filepath=$(echo $insert | sed -e 's/.*<<insert="\(.*\)">>/\1/')
-    echo "Inserting contents of ${filepath}"
+    echo "| inserting contents of ${filepath}"
     if [ ! -f ${filepath} ]; then
         echo "File ${filepath} does not exist!"
         rm $target
