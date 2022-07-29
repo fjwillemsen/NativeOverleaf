@@ -53,8 +53,8 @@ function setupPreferencesPane() {
         <h4>Native Overleaf</h4>
         <div class="containter-fluid">
             <p style="margin: 0">Version ${appversion}</p> 
-            <button id="versionlabel" style="margin-bottom: 5px">check for updates</button>
-            <button href="https://github.com/fjwillemsen/NativeOverleaf">View on GitHub</button>
+            <button id="versionlabel" style="margin-bottom: 5px">Check for updates</button>
+            <button onClick="window.open('https://github.com/fjwillemsen/NativeOverleaf');">View on GitHub</button>
             <form id="native-overleaf-settings" class="settings">
                 <h6>Notifications</h6>
                 <label class="settings-toggle">
