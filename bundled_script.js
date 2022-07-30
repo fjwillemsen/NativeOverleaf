@@ -7,7 +7,7 @@ var colorscheme
 
 // get app version
 // Contents Inserted from appversion.js
-const appversion = "1.3.2"
+const appversion = "1.3.1"
 
 // global variables
 var notificationCounter = 0
