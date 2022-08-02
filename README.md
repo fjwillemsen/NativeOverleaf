@@ -23,6 +23,8 @@ However, would it not be even better if it were to behave like a native app on y
 ## Next Features
 - [ ] automated local backups of projects (planned for next version)
 - [ ] notifications for tracked changes (planned for future version)
+- [ ] words-per-day tracker / reminder: useful for the 200-words-per-day-doctrine (planned for future version)
+- [ ] integrate Writeful for Overleaf (future version if technically possible) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
 
 [Looking to contribute?](#ideas-questions-contributions)
 
@@ -36,6 +38,7 @@ Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf websi
 
 ## Download binary
 If there is interest in this project, I will add it to Homebrew for easy updates. 
+Should you have any problems running the app, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
 For now, the following binaries have been precompiled and can be downloaded directly:
 
 ### **Mac**
@@ -52,7 +55,14 @@ For now, the following binaries have been precompiled and can be downloaded dire
 * [X86 (32-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-ia32.zip)
 * [ARM64 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-arm64.zip)
 
-If your platform is missing, let me know via the [discussions page](https://github.com/fjwillemsen/NativeOverleaf/discussions), or compile it yourself using the instructions below. 
+If your platform / architecture is missing, let me know via the [discussions page](https://github.com/fjwillemsen/NativeOverleaf/discussions), or compile it yourself using the instructions below. 
+
+### **Troubleshooting**
+If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
+
+**Mac**:
+If you get the message that "Apple can't verify this app doesn't contain malware", use right-click -> open to open it. 
+If you get "This app is damaged and can't be opened", download the archive again and unzip it using Finder's built-in Archive Utility or [ditto](https://ss64.com/osx/ditto.html) (otherwise codesigning metadata may be lost). 
 
 
 ## Compile your own
@@ -62,7 +72,7 @@ In just four easy steps you can compile Overleaf as a native app for your device
 - Step 1: open your terminal and `cd` to wherever you want to install Overleaf. 
 - Step 2: download this repository (e.g. `git clone https://github.com/fjwillemsen/NativeOverleaf.git`).
 - Step 3: install nativefier, for example using `brew install nativefier`. 
-- Step 4: use the `compile-all.sh` script for inspiration or run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. 
+- Step 4: use the `compile-all.sh` script (without codesigning) for inspiration or run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. If you do not intend to distribute the app, leave out the codesigning, otherwise create your own self-signed certificate. 
 
 After being built, the app appears in the folder - you can copy it to another location if desired. 
 

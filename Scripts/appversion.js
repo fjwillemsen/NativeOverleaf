@@ -1,1 +1,1 @@
-const appversion = "1.3.1"
+const appversion = "1.3.2"

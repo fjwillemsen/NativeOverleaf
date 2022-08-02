@@ -36,13 +36,19 @@ function compile() {
 }
 
 # Mac
+echo "Compiling for Mac"
 platform="osx"
 icon="Icons/Mac.icns"
 options="--darwin-dark-mode-support --counter --bounce --fast-quit"
 compile $platform "arm64" $icon $options
 compile $platform "x64" $icon $options
+echo "Codesigning Mac apps"
+codesign --deep --force -s "NativeOverleaf" Binaries/Overleaf-darwin-arm64/Overleaf.app
+codesign --deep --force -s "NativeOverleaf" Binaries/Overleaf-darwin-x64/Overleaf.app
+echo ""
 
 # Linux
+echo "Compiling for Linux"
 platform="linux"
 icon="Icons/base_icon.png"
 compile $platform "arm64" $icon
@@ -50,11 +56,11 @@ compile $platform "armv7l" $icon
 compile $platform "x64" $icon
 
 # Windows
+echo "Compiling for Windows"
 platform="windows"
 icon="Icons/Windows.ico"
 compile $platform "arm64" $icon
 compile $platform "x64" $icon
-compile $platform "ia32" $icon
 
 # Zipping
 echo
