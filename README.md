@@ -6,6 +6,23 @@ However, would it not be even better if it were to behave like a native app on y
 
 [Download directly for your system below](#download-binary)!
 
+
+## Contents
+- [Contents](#contents)
+- [Features](#features)
+- [Next Features](#next-features)
+- [Tips](#tips)
+- [How it works](#how-it-works)
+- [Download binary](#download-binary)
+  - [**Mac**](#mac)
+  - [**Linux**](#linux)
+  - [**Windows**](#windows)
+- [Troubleshooting](#troubleshooting)
+  - [Institutional login](#institutional-login)
+  - [Unable to open on Mac](#unable-to-open-on-mac)
+- [Compile your own](#compile-your-own)
+- [Ideas, questions, contributions?](#ideas-questions-contributions)
+
 ## Features
 - [x] standalone native application
 - [x] system-based dark / light mode switching 
@@ -56,14 +73,14 @@ For now, the following binaries have been precompiled and can be downloaded dire
 
 If your platform / architecture is missing, let me know via the [discussions page](https://github.com/fjwillemsen/NativeOverleaf/discussions), or compile it yourself using the instructions below. 
 
-### **Troubleshooting**
+## Troubleshooting
 If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
 
-**General**:
+### Institutional login
 If you have trouble [logging in through your institution](https://www.overleaf.com/institutional-login) because it opens in your OS browser, this is a [known issue](https://github.com/fjwillemsen/NativeOverleaf/issues/3) I'm working to fix. In the meantime, you can circumvent this issue by logging in to Overleaf in your browser, going to [settings](https://www.overleaf.com/user/settings) and adding your institution email address. 
 This allows you to use the institution email address in the normal login in the app. 
 
-**Mac**:
+### Unable to open on Mac
 If you get the message that "Apple can't verify this app doesn't contain malware", use right-click -> open to open it. 
 If you get "This app is damaged and can't be opened", download the archive again and unzip it using Finder's built-in Archive Utility or [ditto](https://ss64.com/osx/ditto.html) (otherwise codesigning metadata may be lost). 
 
