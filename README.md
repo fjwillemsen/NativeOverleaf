@@ -60,8 +60,7 @@ If your platform / architecture is missing, let me know via the [discussions pag
 If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
 
 **General**:
-If you have trouble [logging in through your institution](https://www.overleaf.com/institutional-login) because it opens in your OS browser, I have submitted a [bug issue](https://github.com/nativefier/nativefier/issues/1445) to Nativefier for this. 
-In the meantime, you can circumvent this issue by logging in to Overleaf in your browser, going to [settings](https://www.overleaf.com/user/settings) and adding your institution email address. 
+If you have trouble [logging in through your institution](https://www.overleaf.com/institutional-login) because it opens in your OS browser, this is a [known issue](https://github.com/fjwillemsen/NativeOverleaf/issues/3) I'm working to fix. In the meantime, you can circumvent this issue by logging in to Overleaf in your browser, going to [settings](https://www.overleaf.com/user/settings) and adding your institution email address. 
 This allows you to use the institution email address in the normal login in the app. 
 
 **Mac**:
