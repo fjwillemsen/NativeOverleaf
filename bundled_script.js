@@ -662,6 +662,14 @@ function setAutoUpdateChecking() {
     }
 }
 
+// check if angular is present before continuing
+try { angular; } 
+catch(e) {
+    if(e.name == "ReferenceError") {
+        return;
+    }
+}
+
 // start
 setupColormode()
 setupNotifications()
