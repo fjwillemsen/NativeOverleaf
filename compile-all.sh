@@ -18,6 +18,7 @@ appversion="--app-version $appversionnumber"
 epochtime=$(date +%s)
 buildversion="--build-version $appversionnumber.$epochtime" 
 script="--inject bundled_script.js"
+# internalurls="--internal-urls \".*?(login|profile|engine|auth.*)\..*?(?<TLD>\.\w+?)(?:$|\/)\""   # matches all *(login|profile|engine|auth*).*.<top-level-domain> URLs until the first forward-slash, may be a too greedy because it will also match slugs (e.g. domain.com/login.file.html)
 basecommand="nativefier https://overleaf.com $destination $name $appversion $buildversion $script --overwrite"
 
 # function to compile while filtering the nativefier output so only relevant output remains
