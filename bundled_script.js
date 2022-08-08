@@ -22,6 +22,11 @@ if (window.matchMedia) {
 // Contents Inserted from util.js
 // This file is not intended to run by itself, but is inserted into main.js
 
+// function that returns the current local date of the user as a "YYYY-MM-DD" formatted string
+function getLocalDate() {
+  return new Date().toLocaleDateString("en-CA");
+}
+
 // function that checks a function returning a boolean and backs off for waitTime duration if it is not yet true, maximum numberOfTimesToCheck times
 function recursiveCheckAndWait(
   checkFunction,
@@ -156,56 +161,71 @@ var deepDiffMapper = (function () {
 // Contents Inserted from preferences.js
 // This file is not intended to run by itself, but is inserted into main.js
 
+// extensions for saving and retrieving objects in localstorage
+Storage.prototype.setObject = function (key, value) {
+  this.setItem(key, JSON.stringify(value));
+};
+Storage.prototype.getObject = function (key) {
+  var value = this.getItem(key);
+  return value && JSON.parse(value);
+};
+
 // available themes
 overallThemes_dark = {
-    'dark': 'Default'
-}
+  dark: "Default",
+};
 overallThemes_light = {
-    'light': 'Light',
-}
+  light: "Light",
+};
 editorThemes_dark = {
-    'dracula': 'Dracula',
-    'monokai': 'Monokai',
-    'cobalt': 'Cobalt',
-}
+  dracula: "Dracula",
+  monokai: "Monokai",
+  cobalt: "Cobalt",
+};
 editorThemes_light = {
-    'textmate': 'TextMate',
-    'overleaf': 'Overleaf',
-    'eclipse': 'Eclipse',
-}
+  textmate: "TextMate",
+  overleaf: "Overleaf",
+  eclipse: "Eclipse",
+};
 
 // user preferences (abbreviated UP)
-up_notifications = JSON.parse(localStorage.getItem('notifications')) || true;
-up_notifications_comments = JSON.parse(localStorage.getItem('notifications_comment')) || true;
-up_notifications_comment_threads = JSON.parse(localStorage.getItem('notifications_comment_response')) || true;
-up_notifications_chats = JSON.parse(localStorage.getItem('notifications_chat')) || true;
-up_colormode_switching = JSON.parse(localStorage.getItem('colormode_switching')) || true;
-up_overalltheme_dark = JSON.parse(localStorage.getItem('overalltheme_dark')) || overallThemes_dark[0];
-up_overalltheme_light = JSON.parse(localStorage.getItem('overalltheme_light')) || overallThemes_light[0];
-up_editortheme_dark = JSON.parse(localStorage.getItem('editortheme_dark')) || editorThemes_dark[0];
-up_editortheme_light = JSON.parse(localStorage.getItem('editortheme_light')) || editorThemes_light[0];
+up_notifications = localStorage.getObject("notifications") || true;
+up_notifications_comments =
+  localStorage.getObject("notifications_comment") || true;
+up_notifications_comment_threads =
+  localStorage.getObject("notifications_comment_response") || true;
+up_notifications_chats = localStorage.getObject("notifications_chat") || true;
+up_colormode_switching = localStorage.getObject("colormode_switching") || true;
+up_overalltheme_dark =
+  localStorage.getObject("overalltheme_dark") || overallThemes_dark[0];
+up_overalltheme_light =
+  localStorage.getObject("overalltheme_light") || overallThemes_light[0];
+up_editortheme_dark =
+  localStorage.getObject("editortheme_dark") || editorThemes_dark[0];
+up_editortheme_light =
+  localStorage.getObject("editortheme_light") || editorThemes_light[0];
 
 function getFormSelectHTML(category_dicts, category_names) {
-    var str = ""
-    for (category_index in category_dicts) {
-        var endstr = ""
-        if (category_names.length - 1 >= category_index) {
-            str += `<optgroup label="${category_names[category_index]}">`
-            endstr += "</optgroup>"
-        }
-        category_dict = category_dicts[category_index]
-        for (var key in category_dict) {
-            val = category_dict[key]
-            str += `<option value="${key}">${val}</option>\n`
-        }
-        str += endstr
+  var str = "";
+  for (category_index in category_dicts) {
+    var endstr = "";
+    if (category_names.length - 1 >= category_index) {
+      str += `<optgroup label="${category_names[category_index]}">`;
+      endstr += "</optgroup>";
     }
-    return str
+    category_dict = category_dicts[category_index];
+    for (var key in category_dict) {
+      val = category_dict[key];
+      str += `<option value="${key}">${val}</option>\n`;
+    }
+    str += endstr;
+  }
+  return str;
 }
 
 // settings menu pane
 function setupPreferencesPane() {
-    settings_html = `
+  settings_html = `
         <h4>Native Overleaf</h4>
         <div class="containter-fluid">
             <p style="margin: 0">Version ${appversion}</p> 
@@ -242,133 +262,163 @@ function setupPreferencesPane() {
                 <br/>
                     <label for="overalltheme_dark">Overall</label>
                     <select id="overalltheme_dark">
-                        ${getFormSelectHTML([overallThemes_dark, overallThemes_light], ['dark', 'light'])}
+                        ${getFormSelectHTML(
+                          [overallThemes_dark, overallThemes_light],
+                          ["dark", "light"]
+                        )}
                     </select>
                     <br/>
                     <label for="editortheme_dark">Editor</label>
                     <select id="editortheme_dark">
-                        ${getFormSelectHTML([editorThemes_dark, editorThemes_light], ['dark', 'light'])}
+                        ${getFormSelectHTML(
+                          [editorThemes_dark, editorThemes_light],
+                          ["dark", "light"]
+                        )}
                     </select>
                 <hr/>
                 <b>Light Mode</b>
                 <br/>
                     <label for="overalltheme_light">Overall</label>
                     <select id="overalltheme_light">
-                        ${getFormSelectHTML([overallThemes_light, overallThemes_dark], ['light', 'dark'])}
+                        ${getFormSelectHTML(
+                          [overallThemes_light, overallThemes_dark],
+                          ["light", "dark"]
+                        )}
                     </select>
                     <br/>
                     <label for="editortheme_light">Editor</label>
                     <select id="editortheme_light">
-                        ${getFormSelectHTML([editorThemes_light, editorThemes_dark], ['light', 'dark'])}
+                        ${getFormSelectHTML(
+                          [editorThemes_light, editorThemes_dark],
+                          ["light", "dark"]
+                        )}
                     </select>
             </div>
         </form>`;
-    if (document.querySelector('#left-menu')) {
-        document.querySelector('#left-menu').getElementsByTagName('form')[0].insertAdjacentHTML('afterend', settings_html)
-        settings_form = document.querySelector('#native-overleaf-settings')
-        // load settings
-        settings_form.querySelector('#notifications_chat').checked = up_notifications_chats;
-        settings_form.querySelector('#notifications_comment').checked = up_notifications_comments;
-        settings_form.querySelector('#notifications_comment_response').checked = up_notifications_comment_threads;
-        settings_form.querySelector('#colormode_switching').checked = up_colormode_switching;
-        settings_form.querySelector('#overalltheme_dark').value = up_overalltheme_dark;
-        settings_form.querySelector('#overalltheme_light').value = up_overalltheme_light;
-        settings_form.querySelector('#editortheme_dark').value = up_editortheme_dark;
-        settings_form.querySelector('#editortheme_light').value = up_editortheme_light;
-        // listen for changes and trigger setting change handlers
-        settings_form.addEventListener('change', function() {
-            for (var id_key in settings_handler) {
-                settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`))
-            }
-        });
-    }
+  if (document.querySelector("#left-menu")) {
+    document
+      .querySelector("#left-menu")
+      .getElementsByTagName("form")[0]
+      .insertAdjacentHTML("afterend", settings_html);
+    settings_form = document.querySelector("#native-overleaf-settings");
+    // load settings
+    settings_form.querySelector("#notifications_chat").checked =
+      up_notifications_chats;
+    settings_form.querySelector("#notifications_comment").checked =
+      up_notifications_comments;
+    settings_form.querySelector("#notifications_comment_response").checked =
+      up_notifications_comment_threads;
+    settings_form.querySelector("#colormode_switching").checked =
+      up_colormode_switching;
+    settings_form.querySelector("#overalltheme_dark").value =
+      up_overalltheme_dark;
+    settings_form.querySelector("#overalltheme_light").value =
+      up_overalltheme_light;
+    settings_form.querySelector("#editortheme_dark").value =
+      up_editortheme_dark;
+    settings_form.querySelector("#editortheme_light").value =
+      up_editortheme_light;
+    // listen for changes and trigger setting change handlers
+    settings_form.addEventListener("change", function () {
+      for (var id_key in settings_handler) {
+        settings_handler[id_key](
+          id_key,
+          settings_form.querySelector(`#${id_key}`)
+        );
+      }
+    });
+  }
 }
 
 // setting handlers
 var settings_handler = {
-    notifications_chat: set_notifications_chat,
-    notifications_comment: set_notifications_comment,
-    notifications_comment_response: set_notifications_comment_response,
-    colormode_switching: set_colormode_switching,
-    overalltheme_dark: set_overalltheme_dark,
-    overalltheme_light: set_overalltheme_light,
-    editortheme_dark: set_editortheme_dark,
-    editortheme_light: set_editortheme_light
+  notifications_chat: set_notifications_chat,
+  notifications_comment: set_notifications_comment,
+  notifications_comment_response: set_notifications_comment_response,
+  colormode_switching: set_colormode_switching,
+  overalltheme_dark: set_overalltheme_dark,
+  overalltheme_light: set_overalltheme_light,
+  editortheme_dark: set_editortheme_dark,
+  editortheme_light: set_editortheme_light,
+};
+
+function set_notifications_chat(key, value, _) {
+  if (value != up_notifications_chats) {
+    up_notifications_chats = value.checked;
+    localStorage.setObject(key, value.checked);
+    // register the eventlisteners again
+    destructNotifications();
+    setupNotifications();
+  }
 }
 
-function set_notifications_chat(key, value, _) { 
-    if (value != up_notifications_chats) {
-        up_notifications_chats = value.checked
-        localStorage.setItem(key, JSON.stringify(value.checked))
-        // register the eventlisteners again
-        destructNotifications()
-        setupNotifications()
-    }
-};
+function set_notifications_comment(key, value, _) {
+  if (value.checked != up_notifications_comments) {
+    up_notifications_comments = value.checked;
+    localStorage.setObject(key, value.checked);
+    // register the eventlisteners again
+    destructNotifications();
+    setupNotifications();
+  }
+}
 
-function set_notifications_comment(key, value, _) { 
-    if (value.checked != up_notifications_comments) {
-        up_notifications_comments = value.checked
-        localStorage.setItem(key, JSON.stringify(value.checked))
-        // register the eventlisteners again
-        destructNotifications()
-        setupNotifications()
-    }
-};
+function set_notifications_comment_response(key, value, _) {
+  if (value.checked != up_notifications_comment_threads) {
+    up_notifications_comment_threads = value.checked;
+    localStorage.setObject(key, value.checked);
+    // register the eventlisteners again
+    destructNotifications();
+    setupNotifications();
+  }
+}
 
-function set_notifications_comment_response(key, value, _) { 
-    if (value.checked != up_notifications_comment_threads) {
-        up_notifications_comment_threads = value.checked
-        localStorage.setItem(key, JSON.stringify(value.checked))
-        // register the eventlisteners again
-        destructNotifications()
-        setupNotifications()
+function set_colormode_switching(key, value, _) {
+  if (value.checked != up_colormode_switching) {
+    up_colormode_switching = value.checked;
+    localStorage.setObject(key, value.checked);
+    settings_form.querySelector("#overalltheme_dark").disabled =
+      !up_colormode_switching;
+    settings_form.querySelector("#overalltheme_light").disabled =
+      !up_colormode_switching;
+    settings_form.querySelector("#editortheme_dark").disabled =
+      !up_colormode_switching;
+    settings_form.querySelector("#editortheme_light").disabled =
+      !up_colormode_switching;
+    if (up_colormode_switching == true) {
+      // register the event listener again
+      setupColormode();
+    } else {
+      // remove the event listener
+      destructColormode();
     }
-};
-
-function set_colormode_switching(key, value, _) { 
-    if (value.checked != up_colormode_switching) {
-        up_colormode_switching = value.checked
-        localStorage.setItem(key, JSON.stringify(value.checked))
-        settings_form.querySelector('#overalltheme_dark').disabled = !(up_colormode_switching)
-        settings_form.querySelector('#overalltheme_light').disabled = !(up_colormode_switching)
-        settings_form.querySelector('#editortheme_dark').disabled = !(up_colormode_switching)
-        settings_form.querySelector('#editortheme_light').disabled = !(up_colormode_switching)
-        if (up_colormode_switching == true) {
-            // register the event listener again
-            setupColormode()
-        } else {
-            // remove the event listener
-            destructColormode()
-        }
-    }
-};
+  }
+}
 
 function themesetter(user_preference_variable_name, key, value) {
-    user_preference_variable = eval(user_preference_variable_name)
-    localStorage.setItem(key, JSON.stringify(value.value))
-    if (value.value != user_preference_variable) {
-        // set the "up_.*" variable programmatically because switchColorMode needs it before we can return it
-        eval(`${user_preference_variable_name} = "${value.value}"`)
-        switchColorMode()
-    }
+  user_preference_variable = eval(user_preference_variable_name);
+  localStorage.setObject(key, value.value);
+  if (value.value != user_preference_variable) {
+    // set the "up_.*" variable programmatically because switchColorMode needs it before we can return it
+    eval(`${user_preference_variable_name} = "${value.value}"`);
+    switchColorMode();
+  }
 }
 
-function set_overalltheme_dark(key, value) { 
-    themesetter("up_overalltheme_dark", key, value)
-};
+function set_overalltheme_dark(key, value) {
+  themesetter("up_overalltheme_dark", key, value);
+}
 
-function set_overalltheme_light(key, value) { 
-    themesetter("up_overalltheme_light", key, value)
-};
+function set_overalltheme_light(key, value) {
+  themesetter("up_overalltheme_light", key, value);
+}
 
-function set_editortheme_dark(key, value) { 
-    themesetter("up_editortheme_dark", key, value)
-};
+function set_editortheme_dark(key, value) {
+  themesetter("up_editortheme_dark", key, value);
+}
 
-function set_editortheme_light(key, value) { 
-    themesetter("up_editortheme_light", key, value)
-};
+function set_editortheme_light(key, value) {
+  themesetter("up_editortheme_light", key, value);
+}
 // Contents Inserted from colormode.js
 // This file is not intended to run by itself, but is inserted into main.js
 
@@ -738,7 +788,12 @@ function setAutoUpdateChecking() {
 }
 // Contents Inserted from wordcount.js
 up_keepwordcount = true;
+up_wordcountinterval = 15;
 up_wordcountdailytarget = 200;
+up_wordcountnotifyhour = 20;
+
+let wordcounts;
+let wordcount_timer_id;
 
 async function waitUntilPDFCompiled() {
   return await recursiveCheckAndWait(isPDFLinkAvailable, 2000, 3, true);
@@ -746,19 +801,14 @@ async function waitUntilPDFCompiled() {
 
 // extracts the word count from the modal if it is visible
 function extractWordCount() {
-  console.log("extract wordcount");
   const modal = document.getElementById("clone-project-modal");
-  console.log(modal);
   if (modal && modal !== undefined) {
     const modaltext = modal.outerText;
-    console.log(modaltext);
     const wordcount = modaltext.substring(
       modaltext.lastIndexOf("\nTotal Words:\n") + 14,
       modaltext.lastIndexOf("\nHeaders:")
     );
-    console.log(wordcount);
     const parsedWordCount = parseInt(wordcount);
-    console.log(parsedWordCount);
     if (isNaN(parsedWordCount) == false) {
       return parsedWordCount;
     }
@@ -771,7 +821,6 @@ async function getWordCount() {
     "[ng-controller=WordCountModalController]"
   );
   if (
-    up_keepwordcount == true &&
     wordcount_el &&
     wordcount_el !== undefined &&
     wordcount_el.scope !== undefined
@@ -796,25 +845,118 @@ async function getWordCount() {
         return;
       }
       return wordcount;
-
-      //   //   wait 1 second after opening for the numbers to be there
-      //   setTimeout(function () {
-      //     extractWordCount();
-      //     wordcount_scope.handleHide();
-      //   }, 1000);
     }
   }
 }
 
-function setupWordCount() {
-  const wordcount = getWordCount();
-  // maybe use this.lastModified?
-  // do a wordcount every 15 minutes
-  // setInterval(getWordCount, 15 * 60 * 1000);
-  // save it to localStorage.[this.project_id].[currentdate].latest
+function getWordCounts() {
+  let wordcounts = localStorage.getObject("wordcounts") || {};
+  if (!(this.project_id in wordcounts)) {
+    wordcounts[this.project_id] = {};
+  }
+  const currentdate = getLocalDate();
+  if (!(currentdate in wordcounts[this.project_id])) {
+    wordcounts[this.project_id][currentdate] = {
+      earliest: undefined,
+      latest: undefined,
+      hasbeennotified: false,
+    };
+  }
+  return wordcounts;
 }
 
 // reset the wordcount history (in case you change your system's date)
+function resetWordCounts() {
+  return localStorage.removeItem("wordcounts");
+}
+
+function getEarliestWordCount() {
+  const wordcounts = getWordCount();
+}
+
+function saveLatestWordCount(wordcounts) {
+  if (this.project_id in wordcounts) {
+    const currentdate = getLocalDate();
+    if (!(currentdate in wordcounts[this.project_id])) {
+    }
+    return localStorage.setObject("wordcounts", wordcounts);
+  }
+  console.error("Unable to save wordcount, project ID not in object");
+}
+
+function updateWordCount() {
+  const currentdate = getLocalDate();
+  let wordcounts = getWordCounts();
+  const wordcount = getWordCount();
+  const hasbeennotified =
+    wordcounts[this.project_id][currentdate].hasbeennotified;
+  if (wordcount === undefined) {
+    return;
+  }
+
+  // if the earliest wordcount is not defined, use the previous latest wordcount
+  if (wordcounts[this.project_id][currentdate].earliest === undefined) {
+    wordcounts[this.project_id][currentdate].earliest =
+      wordcounts[this.project_id][currentdate].latest || wordcount;
+  }
+  // update the latest wordcount
+  wordcounts[this.project_id][currentdate].latest = wordcount;
+  const achieved_wordcount =
+    wordcount - wordcounts[this.project_id][currentdate].earliest;
+
+  // notify the user if the target number of words are reached
+  if (
+    hasbeennotified == false &&
+    achieved_wordcount >= up_wordcountdailytarget
+  ) {
+    new Notification("Awesome, already met today's target!", {
+      body: `You wrote ${achieved_wordcount} words, ${
+        achieved_wordcount - up_wordcountdailytarget
+      } above target!`,
+    });
+    wordcounts[this.project_id][currentdate].hasbeennotified = true;
+  }
+
+  // notify the user if the target time is reached
+  if (hasbeennotified == false && up_wordcountnotifyhour !== undefined) {
+    const currenttime = new Date();
+    if (currenttime.getHours() == up_wordcountnotifyhour) {
+      if (currenttime.getMinutes() <= up_wordcountinterval) {
+        if (achieved_wordcount < up_wordcountdailytarget) {
+          new Notification("You failed to meet today's target", {
+            body: `You wrote ${achieved_wordcount} out of ${up_wordcountdailytarget} words.`,
+          });
+        } else {
+          new Notification("Congrats, you met today's target!", {
+            body: `You wrote ${achieved_wordcount} words, ${
+              achieved_wordcount - up_wordcountdailytarget
+            } above target!`,
+          });
+        }
+        wordcounts[this.project_id][currentdate].hasbeennotified = true;
+      }
+    }
+  }
+
+  // save the update object to the localstorage
+  localStorage.setObject("wordcounts", wordcounts);
+}
+
+function setupWordCount() {
+  if (up_keepwordcount == true) {
+    updateWordCount();
+    wordcount_timer_id = setInterval(
+      updateWordCount,
+      up_wordcountinterval * 60 * 1000
+    );
+  }
+}
+
+function destructWordCount() {
+  if (up_keepwordcount == false && wordcount_timer_id !== undefined) {
+    clearInterval(wordcount_timer_id);
+  }
+}
 // Contents Inserted from backup.js
 backup_types = ["Source", "PDF"];
 up_backup = true;

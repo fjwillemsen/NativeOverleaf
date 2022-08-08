@@ -1,5 +1,10 @@
 // This file is not intended to run by itself, but is inserted into main.js
 
+// function that returns the current local date of the user as a "YYYY-MM-DD" formatted string
+function getLocalDate() {
+  return new Date().toLocaleDateString("en-CA");
+}
+
 // function that checks a function returning a boolean and backs off for waitTime duration if it is not yet true, maximum numberOfTimesToCheck times
 function recursiveCheckAndWait(
   checkFunction,
