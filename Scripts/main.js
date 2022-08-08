@@ -25,6 +25,8 @@ if (window.matchMedia) {
 <<insert="notificationsbadge.js">>
 <<insert="css.js">>
 <<insert="update.js">>
+<<insert="wordcount.js">>
+<<insert="backup.js">>
 
 // check if angular is present before continuing
 try { angular; } 
@@ -40,3 +42,5 @@ setupNotifications()
 setupPreferencesPane()
 addCSS()
 setAutoUpdateChecking()
+setupWordCount()
+// setupBackup()

@@ -7,7 +7,7 @@ var colorscheme
 
 // get app version
 // Contents Inserted from appversion.js
-const appversion = "1.3.2"
+const appversion = "1.4.0";
 
 // global variables
 var notificationCounter = 0
@@ -22,95 +22,137 @@ if (window.matchMedia) {
 // Contents Inserted from util.js
 // This file is not intended to run by itself, but is inserted into main.js
 
-var deepDiffMapper = function () {
-    return {
-        VALUE_CREATED: 'created',
-        VALUE_UPDATED: 'updated',
-        VALUE_DELETED: 'deleted',
-        VALUE_UNCHANGED: '---',
-        map: function (obj1, obj2) {
-            if (this.isFunction(obj1) || this.isFunction(obj2)) {
-                throw 'Invalid argument. Function given, object expected.';
-            }
-            if (this.isValue(obj1) || this.isValue(obj2)) {
-                let returnObj = {
-                    type: this.compareValues(obj1, obj2),
-                    original: obj1,
-                    updated: obj2,
-                };
-                if (returnObj.type != this.VALUE_UNCHANGED) {
-                    return returnObj;
-                }
-                return undefined;
-            }
+// function that checks a function returning a boolean and backs off for waitTime duration if it is not yet true, maximum numberOfTimesToCheck times
+function recursiveCheckAndWait(
+  checkFunction,
+  waitTime,
+  numberOfTimesToCheck,
+  multiplyWaitTime = false,
+  numberOfTimesChecked = 0
+) {
+  checkFunctionResult = checkFunction();
+  if (checkFunctionResult != false) {
+    // if the function does not return false, return its value
+    return checkFunctionResult;
+  } else if (numberOfTimesToCheck - numberOfTimesChecked <= 0) {
+    // if we have ran out of checks, return false
+    return false;
+  } else {
+    // else create a new timeout to check again after the waitTime
+    return new Promise((resolve) => {
+      numberOfTimesChecked += 1;
+      if (multiplyWaitTime == true) {
+        waitTime = waitTime * numberOfTimesChecked;
+      }
+      setTimeout(() => {
+        resolve(
+          recursiveCheckAndWait(
+            checkFunction,
+            waitTime,
+            numberOfTimesToCheck,
+            multiplyWaitTime,
+            numberOfTimesChecked
+          )
+        );
+      }, waitTime);
+    });
+  }
+}
 
-            var diff = {};
-            let foundKeys = {};
-            for (var key in obj1) {
-                if (this.isFunction(obj1[key])) {
-                    continue;
-                }
-
-                var value2 = undefined;
-                if (obj2[key] !== undefined) {
-                    value2 = obj2[key];
-                }
-
-                let mapValue = this.map(obj1[key], value2);
-                foundKeys[key] = true;
-                if (mapValue) {
-                    diff[key] = mapValue;
-                }
-            }
-            for (var key in obj2) {
-                if (this.isFunction(obj2[key]) || foundKeys[key] !== undefined) {
-                    continue;
-                }
-
-                let mapValue = this.map(undefined, obj2[key]);
-                if (mapValue) {
-                    diff[key] = mapValue;
-                }
-            }
-
-            //2020-06-13: object length code copied from https://stackoverflow.com/a/13190981/2336212
-            if (Object.keys(diff).length > 0) {
-                return diff;
-            }
-            return undefined;
-        },
-        compareValues: function (value1, value2) {
-            if (value1 === value2) {
-                return this.VALUE_UNCHANGED;
-            }
-            if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
-                return this.VALUE_UNCHANGED;
-            }
-            if (value1 === undefined) {
-                return this.VALUE_CREATED;
-            }
-            if (value2 === undefined) {
-                return this.VALUE_DELETED;
-            }
-            return this.VALUE_UPDATED;
-        },
-        isFunction: function (x) {
-            return Object.prototype.toString.call(x) === '[object Function]';
-        },
-        isArray: function (x) {
-            return Object.prototype.toString.call(x) === '[object Array]';
-        },
-        isDate: function (x) {
-            return Object.prototype.toString.call(x) === '[object Date]';
-        },
-        isObject: function (x) {
-            return Object.prototype.toString.call(x) === '[object Object]';
-        },
-        isValue: function (x) {
-            return !this.isObject(x) && !this.isArray(x);
+// function for mapping the difference between two objects
+var deepDiffMapper = (function () {
+  return {
+    VALUE_CREATED: "created",
+    VALUE_UPDATED: "updated",
+    VALUE_DELETED: "deleted",
+    VALUE_UNCHANGED: "---",
+    map: function (obj1, obj2) {
+      if (this.isFunction(obj1) || this.isFunction(obj2)) {
+        throw "Invalid argument. Function given, object expected.";
+      }
+      if (this.isValue(obj1) || this.isValue(obj2)) {
+        let returnObj = {
+          type: this.compareValues(obj1, obj2),
+          original: obj1,
+          updated: obj2,
+        };
+        if (returnObj.type != this.VALUE_UNCHANGED) {
+          return returnObj;
         }
-    }
-}();
+        return undefined;
+      }
+
+      var diff = {};
+      let foundKeys = {};
+      for (var key in obj1) {
+        if (this.isFunction(obj1[key])) {
+          continue;
+        }
+
+        var value2 = undefined;
+        if (obj2[key] !== undefined) {
+          value2 = obj2[key];
+        }
+
+        let mapValue = this.map(obj1[key], value2);
+        foundKeys[key] = true;
+        if (mapValue) {
+          diff[key] = mapValue;
+        }
+      }
+      for (var key in obj2) {
+        if (this.isFunction(obj2[key]) || foundKeys[key] !== undefined) {
+          continue;
+        }
+
+        let mapValue = this.map(undefined, obj2[key]);
+        if (mapValue) {
+          diff[key] = mapValue;
+        }
+      }
+
+      //2020-06-13: object length code copied from https://stackoverflow.com/a/13190981/2336212
+      if (Object.keys(diff).length > 0) {
+        return diff;
+      }
+      return undefined;
+    },
+    compareValues: function (value1, value2) {
+      if (value1 === value2) {
+        return this.VALUE_UNCHANGED;
+      }
+      if (
+        this.isDate(value1) &&
+        this.isDate(value2) &&
+        value1.getTime() === value2.getTime()
+      ) {
+        return this.VALUE_UNCHANGED;
+      }
+      if (value1 === undefined) {
+        return this.VALUE_CREATED;
+      }
+      if (value2 === undefined) {
+        return this.VALUE_DELETED;
+      }
+      return this.VALUE_UPDATED;
+    },
+    isFunction: function (x) {
+      return Object.prototype.toString.call(x) === "[object Function]";
+    },
+    isArray: function (x) {
+      return Object.prototype.toString.call(x) === "[object Array]";
+    },
+    isDate: function (x) {
+      return Object.prototype.toString.call(x) === "[object Date]";
+    },
+    isObject: function (x) {
+      return Object.prototype.toString.call(x) === "[object Object]";
+    },
+    isValue: function (x) {
+      return !this.isObject(x) && !this.isArray(x);
+    },
+  };
+})();
 // Contents Inserted from preferences.js
 // This file is not intended to run by itself, but is inserted into main.js
 
@@ -373,136 +415,169 @@ function destructColormode() {
 // This file is not intended to run by itself, but is inserted into main.js
 
 function sendNotification(text) {
-    new Notification(`${text}`);
-    updateCounter(1);
+  new Notification(`${text}`);
+  updateCounter(1);
 }
 
 // setup notifications
 function setupNotifications() {
-    // first check if notifications are used at all before setting up
-    const any_notifications_used = up_notifications_chats == true || up_notifications_comments == true || up_notifications_comment_threads == true
-    if (up_notifications == true && any_notifications_used == true) {
-        // check if browser supports notifications
-        if (!("Notification" in window)) {
-            alert("This browser does not support notifications");
-        }
-
-        // Let's check whether notification permissions have already been granted
-        else if (Notification.permission === "granted") {
-            // If it's okay let's create a notification
-            // sendNotification("Notifications are enabled");
-        }
-
-        // Otherwise, we need to ask the user for permission
-        else if (Notification.permission !== 'denied') {
-            Notification.requestPermission(function (permission) {
-                // If the user accepts, let's create a notification
-                if (permission === "granted") {
-                    sendNotification("Notifications are now enabled");
-                }
-            });
-        }
-
-        // reset notifications if the window is in focus
-        addEventListener('focus', resetCounter);
-        
-        // set watch on comment threads
-        if (up_notifications_comments == true) {
-            comments_scope = angular.element('[ng-controller=ReviewPanelController]').scope();
-            // if the ReviewPanelController is in scope, set a watcher
-            if (comments_scope) {
-                // if there are new comments, find the new ones and emit a notification for it
-                if (comments_watcher_unbind !== undefined) {
-                    throw "comments_watcher_unbind should be undefined at this point"
-                }
-                comments_watcher_unbind = comments_scope.$watch('reviewPanel.commentThreads', function(newVal, oldVal) {
-                    diffs = deepDiffMapper.map(oldVal, newVal)
-                    for (const diff_key in diffs) {
-                        // unpack payload
-                        var payload = diffs[diff_key]
-
-                        // when a comment is resolved
-                        if (payload.resolved && payload.resolved_at && payload.resolved_by_user) {
-                            user = payload.resolved_by_user.updated
-                            // check if this is newer than the last reset and if the user did not do it themselves 
-                            if (new Date(payload.resolved_at.updated) > lastNotificationResetTimestamp && !(user.isSelf)) {
-                                sendNotification(`${user.name} resolved a comment`)
-                            }
-                        }
-
-                        // new comment threads and new comments in a thread use the same structure
-                        var actionText = "responded to a comment"
-                        if (payload.updated) {
-                            payload = payload.updated
-                            actionText = "commented"
-                        }
-                        messages = payload.messages
-                        for (const message_index in messages) {
-                            // unpack message
-                            var message = messages[message_index]
-                            if (message.updated) {
-                                message = message.updated
-                                // if notifications of comment threads are not enabled, skip this message   (TODO check if it is safe to break here?)
-                                if (!(up_notifications_comment_threads)) {
-                                    continue;
-                                }
-                            }
-                            // check if message was sent after latest timestamp, it is not a self-comment and the contents exist
-                            if (message.timestamp > lastNotificationResetTimestamp && message.user && message.content && !(message.user.isSelf)) {
-                                sendNotification(`${message.user.name} ${actionText}: ${message.content}`)
-                            }
-                        }
-                    }
-                }, true);
-            }
-        }
-
-        // set watch on chat
-        if (up_notifications_chats == true) {
-            chat_scope = angular.element('[class="infinite-scroll messages"]').children().children()
-            if (chat_scope && chat_scope.length && chat_scope[1]) {
-                if (chat_observer === undefined) {
-                    chat_observer = new MutationObserver(function(mutations) {
-                        if (mutations.length) {
-                            mutations = mutations[mutations.length - 1]
-                        }
-                        // only continue if the mutation was at least two seconds after last reset to avoid sending historical chats
-                        if (Date.now() > lastNotificationResetTimestamp + (2*1000)) {
-                            for (const message_index in mutations.addedNodes) {
-                                message = mutations.addedNodes[message_index]
-                                if (message.getElementsByClassName) {
-                                    wrapper = message.getElementsByClassName("message-wrapper")[0]
-                                    // there is only a name if the sender is not self
-                                    if (wrapper.getElementsByClassName('name').length) {
-                                        sendername = wrapper.getElementsByClassName('name')[0].getElementsByTagName('span')[0].innerHTML
-                                        contents = wrapper.getElementsByClassName('message')[0].getElementsByClassName('message-content')
-                                        last_texts = contents[contents.length - 1].getElementsByTagName('p')
-                                        last_text = last_texts[last_texts.length - 1].innerHTML
-                                        sendNotification(`${sendername} in chat: ${last_text}`)
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                chat_observer.observe(chat_scope[1], {
-                    childList: true,
-                    subtree: true
-                })
-            }
-        }
+  // first check if notifications are used at all before setting up
+  const any_notifications_used =
+    up_notifications_chats == true ||
+    up_notifications_comments == true ||
+    up_notifications_comment_threads == true;
+  if (up_notifications == true && any_notifications_used == true) {
+    // check if browser supports notifications
+    if (!("Notification" in window)) {
+      alert("This browser does not support notifications");
     }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+      // If it's okay let's create a notification
+      // sendNotification("Notifications are enabled");
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== "denied") {
+      Notification.requestPermission(function (permission) {
+        // If the user accepts, let's create a notification
+        if (permission === "granted") {
+          sendNotification("Notifications are now enabled");
+        }
+      });
+    }
+
+    // reset notifications if the window is in focus
+    addEventListener("focus", resetCounter);
+
+    // set watch on comment threads
+    if (up_notifications_comments == true) {
+      comments_scope = angular
+        .element("[ng-controller=ReviewPanelController]")
+        .scope();
+      // if the ReviewPanelController is in scope, set a watcher
+      if (comments_scope) {
+        // if there are new comments, find the new ones and emit a notification for it
+        if (comments_watcher_unbind !== undefined) {
+          throw "comments_watcher_unbind should be undefined at this point";
+        }
+        comments_watcher_unbind = comments_scope.$watch(
+          "reviewPanel.commentThreads",
+          function (newVal, oldVal) {
+            diffs = deepDiffMapper.map(oldVal, newVal);
+            for (const diff_key in diffs) {
+              // unpack payload
+              var payload = diffs[diff_key];
+
+              // when a comment is resolved
+              if (
+                payload.resolved &&
+                payload.resolved_at &&
+                payload.resolved_by_user
+              ) {
+                user = payload.resolved_by_user.updated;
+                // check if this is newer than the last reset and if the user did not do it themselves
+                if (
+                  new Date(payload.resolved_at.updated) >
+                    lastNotificationResetTimestamp &&
+                  !user.isSelf
+                ) {
+                  sendNotification(`${user.name} resolved a comment`);
+                }
+              }
+
+              // new comment threads and new comments in a thread use the same structure
+              var actionText = "responded to a comment";
+              if (payload.updated) {
+                payload = payload.updated;
+                actionText = "commented";
+              }
+              messages = payload.messages;
+              for (const message_index in messages) {
+                // unpack message
+                var message = messages[message_index];
+                if (message.updated) {
+                  message = message.updated;
+                  // if notifications of comment threads are not enabled, skip this message   (TODO check if it is safe to break here?)
+                  if (!up_notifications_comment_threads) {
+                    continue;
+                  }
+                }
+                // check if message was sent after latest timestamp, it is not a self-comment and the contents exist
+                if (
+                  message.timestamp > lastNotificationResetTimestamp &&
+                  message.user &&
+                  message.content &&
+                  !message.user.isSelf
+                ) {
+                  sendNotification(
+                    `${message.user.name} ${actionText}: ${message.content}`
+                  );
+                }
+              }
+            }
+          },
+          true
+        );
+      }
+    }
+
+    // set watch on chat
+    if (up_notifications_chats == true) {
+      chat_scope = angular
+        .element('[class="infinite-scroll messages"]')
+        .children()
+        .children();
+      if (chat_scope && chat_scope.length && chat_scope[1]) {
+        if (chat_observer === undefined) {
+          chat_observer = new MutationObserver(function (mutations) {
+            if (mutations.length) {
+              mutations = mutations[mutations.length - 1];
+            }
+            // only continue if the mutation was at least two seconds after last reset to avoid sending historical chats
+            if (Date.now() > lastNotificationResetTimestamp + 2 * 1000) {
+              for (const message_index in mutations.addedNodes) {
+                message = mutations.addedNodes[message_index];
+                if (message.getElementsByClassName) {
+                  wrapper =
+                    message.getElementsByClassName("message-wrapper")[0];
+                  // there is only a name if the sender is not self
+                  if (wrapper.getElementsByClassName("name").length) {
+                    sendername = wrapper
+                      .getElementsByClassName("name")[0]
+                      .getElementsByTagName("span")[0].innerHTML;
+                    contents = wrapper
+                      .getElementsByClassName("message")[0]
+                      .getElementsByClassName("message-content");
+                    last_texts =
+                      contents[contents.length - 1].getElementsByTagName("p");
+                    last_text = last_texts[last_texts.length - 1].innerHTML;
+                    sendNotification(`${sendername} in chat: ${last_text}`);
+                  }
+                }
+              }
+            }
+          });
+        }
+        chat_observer.observe(chat_scope[1], {
+          childList: true,
+          subtree: true,
+        });
+      }
+    }
+  }
 }
 
 function destructNotifications() {
-    if (comments_watcher_unbind !== undefined) {
-        comments_watcher_unbind()
-        comments_watcher_unbind = undefined
-    }
-    if (chat_observer !== undefined) {
-        chat_observer.disconnect()
-    }
-    removeEventListener('focus', resetCounter)
+  if (comments_watcher_unbind !== undefined) {
+    comments_watcher_unbind();
+    comments_watcher_unbind = undefined;
+  }
+  if (chat_observer !== undefined) {
+    chat_observer.disconnect();
+  }
+  removeEventListener("focus", resetCounter);
 }
 // Contents Inserted from notificationsbadge.js
 // This file is not intended to run by itself, but is inserted into main.js
@@ -661,6 +736,116 @@ function setAutoUpdateChecking() {
         document.querySelector('#versionlabel').onclick = function(){ checkForUpdate(true) }
     }
 }
+// Contents Inserted from wordcount.js
+up_keepwordcount = true;
+up_wordcountdailytarget = 200;
+
+async function waitUntilPDFCompiled() {
+  return await recursiveCheckAndWait(isPDFLinkAvailable, 2000, 3, true);
+}
+
+// extracts the word count from the modal if it is visible
+function extractWordCount() {
+  console.log("extract wordcount");
+  const modal = document.getElementById("clone-project-modal");
+  console.log(modal);
+  if (modal && modal !== undefined) {
+    const modaltext = modal.outerText;
+    console.log(modaltext);
+    const wordcount = modaltext.substring(
+      modaltext.lastIndexOf("\nTotal Words:\n") + 14,
+      modaltext.lastIndexOf("\nHeaders:")
+    );
+    console.log(wordcount);
+    const parsedWordCount = parseInt(wordcount);
+    console.log(parsedWordCount);
+    if (isNaN(parsedWordCount) == false) {
+      return parsedWordCount;
+    }
+  }
+  return false;
+}
+
+async function getWordCount() {
+  let wordcount_el = angular.element(
+    "[ng-controller=WordCountModalController]"
+  );
+  if (
+    up_keepwordcount == true &&
+    wordcount_el &&
+    wordcount_el !== undefined &&
+    wordcount_el.scope !== undefined
+  ) {
+    let wordcount_scope = wordcount_el.scope();
+
+    if (
+      wordcount_scope !== undefined &&
+      (await waitUntilPDFCompiled()) == true
+    ) {
+      //   console.log(wordcount_scope);
+      wordcount_scope.openWordCountModal();
+      //   console.log("wordcount: ");
+      //   extractWordCount();
+      //   wordcount_scope.handleHide();
+
+      // check if the wordcount is loaded in quick successions, 100 attempts with a timeout of 50ms
+      const wordcount = await recursiveCheckAndWait(extractWordCount, 50, 100);
+      wordcount_scope.handleHide();
+      if (wordcount == false) {
+        console.warn("Unable to get wordcount within 5 seconds, skipping");
+        return;
+      }
+      return wordcount;
+
+      //   //   wait 1 second after opening for the numbers to be there
+      //   setTimeout(function () {
+      //     extractWordCount();
+      //     wordcount_scope.handleHide();
+      //   }, 1000);
+    }
+  }
+}
+
+function setupWordCount() {
+  const wordcount = getWordCount();
+  // maybe use this.lastModified?
+  // do a wordcount every 15 minutes
+  // setInterval(getWordCount, 15 * 60 * 1000);
+  // save it to localStorage.[this.project_id].[currentdate].latest
+}
+
+// reset the wordcount history (in case you change your system's date)
+// Contents Inserted from backup.js
+backup_types = ["Source", "PDF"];
+up_backup = true;
+up_backup_type = 0;
+
+function getBackupLink(backup_type_index) {
+  if (document.querySelector("#left-menu")) {
+    backup_source_html = document
+      .querySelector("#left-menu")
+      .getElementsByClassName("nav-downloads")[0]
+      .getElementsByTagName("li")[backup_type_index];
+    if (
+      backup_source_html !== undefined &&
+      backup_source_html.getElementsByTagName("a").length > 0
+    ) {
+      return backup_source_html.getElementsByTagName("a")[0].href;
+    }
+  }
+  return "";
+}
+
+function isPDFLinkAvailable() {
+  return getBackupLink(1) != "";
+}
+
+function doBackup() {
+  getBackupLink(up_backup_type);
+  // use IndexedDB to write the backups in the background, show an overview in the settings pane where users can download a backup
+}
+
+// function setupBackup() {}
 
 // check if angular is present before continuing
 try { angular; } 
@@ -676,3 +861,5 @@ setupNotifications()
 setupPreferencesPane()
 addCSS()
 setAutoUpdateChecking()
+setupWordCount()
+// setupBackup()
