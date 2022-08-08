@@ -8,6 +8,14 @@ var colorscheme
 // get app version
 <<insert="appversion.js">>
 
+// check if angular is present before continuing
+try { angular; } 
+catch(e) {
+    if(e.name == "ReferenceError") {
+        return;
+    }
+}
+
 // global variables
 var notificationCounter = 0
 var lastNotificationResetTimestamp = Date.now()
@@ -27,14 +35,6 @@ if (window.matchMedia) {
 <<insert="update.js">>
 <<insert="wordcount.js">>
 <<insert="backup.js">>
-
-// check if angular is present before continuing
-try { angular; } 
-catch(e) {
-    if(e.name == "ReferenceError") {
-        return;
-    }
-}
 
 // start
 setupColormode()

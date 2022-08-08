@@ -1,33 +1,37 @@
 // This file is not intended to run by itself, but is inserted into main.js
 
 // available themes
-overallThemes_dark = {
+const overallThemes_dark = {
     dark: "Default",
 };
-overallThemes_light = {
+const overallThemes_light = {
     light: "Light",
 };
-editorThemes_dark = {
+const editorThemes_dark = {
     dracula: "Dracula",
     monokai: "Monokai",
     cobalt: "Cobalt",
 };
-editorThemes_light = {
+const editorThemes_light = {
     textmate: "TextMate",
     overleaf: "Overleaf",
     eclipse: "Eclipse",
 };
 
 // user preferences (abbreviated UP)
-up_notifications = localStorage.getObject("notifications") || true;
-up_notifications_comments = localStorage.getObject("notifications_comment") || true;
-up_notifications_comment_threads = localStorage.getObject("notifications_comment_response") || true;
-up_notifications_chats = localStorage.getObject("notifications_chat") || true;
-up_colormode_switching = localStorage.getObject("colormode_switching") || true;
-up_overalltheme_dark = localStorage.getObject("overalltheme_dark") || overallThemes_dark[0];
-up_overalltheme_light = localStorage.getObject("overalltheme_light") || overallThemes_light[0];
-up_editortheme_dark = localStorage.getObject("editortheme_dark") || editorThemes_dark[0];
-up_editortheme_light = localStorage.getObject("editortheme_light") || editorThemes_light[0];
+let up_notifications = localStorage.getObject("notifications") || true;
+let up_notifications_comments = localStorage.getObject("notifications_comment") || true;
+let up_notifications_comment_threads = localStorage.getObject("up_notifications_comment_response") || true;
+let up_notifications_chats = localStorage.getObject("notifications_chat") || true;
+let up_colormode_switching = localStorage.getObject("colormode_switching") || true;
+let up_overalltheme_dark = localStorage.getObject("overalltheme_dark") || overallThemes_dark[0];
+let up_overalltheme_light = localStorage.getObject("overalltheme_light") || overallThemes_light[0];
+let up_editortheme_dark = localStorage.getObject("editortheme_dark") || editorThemes_dark[0];
+let up_editortheme_light = localStorage.getObject("editortheme_light") || editorThemes_light[0];
+let up_wordcount_tracking = localStorage.getObject("wordcount_tracking") || true; // whether wordcount tracking is enabled
+let up_wordcount_interval = localStorage.getObject("wordcount_interval") || 15; // interval to check on the wordcount in minutes
+let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget") || 200; // net number of words that must be produced daily
+let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour") || 18; // hour of the day at which the user is notified whether they have achieved their goal
 
 function getFormSelectHTML(category_dicts, category_names) {
     var str = "";
@@ -57,63 +61,79 @@ function setupPreferencesPane() {
             <button onClick="window.open('https://github.com/fjwillemsen/NativeOverleaf');">View on GitHub</button>
             <form id="native-overleaf-settings" class="settings">
                 <h6>Notifications</h6>
-                <label class="settings-toggle">
-                    <input id="notifications_chat" class="settings-toggle-checkbox" type="checkbox">
-                    <div class="settings-toggle-switch"></div>
-                    <span class="settings-toggle-label">Chat messages</span>
-                </label>
-                <br/>
-                <label class="settings-toggle">
-                    <input id="notifications_comment" class="settings-toggle-checkbox" type="checkbox">
-                    <div class="settings-toggle-switch"></div>
-                    <span class="settings-toggle-label">Comments</span>
-                </label>
-                <br/>
-                <label class="settings-toggle">
-                    <input id="notifications_comment_response" class="settings-toggle-checkbox" type="checkbox">
-                    <div class="settings-toggle-switch"></div>
-                    <span class="settings-toggle-label">Comment threads</span>
-                </label>
+                    <label class="settings-toggle">
+                        <input id="notifications_chat" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Chat messages</span>
+                    </label>
+                    <br/>
+                    <label class="settings-toggle">
+                        <input id="notifications_comment" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Comments</span>
+                    </label>
+                    <br/>
+                    <label class="settings-toggle">
+                        <input id="notifications_comment_response" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Comment threads</span>
+                    </label>
                 <hr/>
                 <h6>Dark / Light Mode</h6>
-                <label class="settings-toggle">
-                    <input id="colormode_switching" class="settings-toggle-checkbox" type="checkbox">
-                    <div class="settings-toggle-switch"></div>
-                    <span class="settings-toggle-label">Follow system</span>
-                </label>
-                <hr/>
-                <b>Dark Mode</b>
-                <br/>
-                    <label for="overalltheme_dark">Overall</label>
-                    <select id="overalltheme_dark">
-                        ${getFormSelectHTML([overallThemes_dark, overallThemes_light], ["dark", "light"])}
-                    </select>
+                    <label class="settings-toggle">
+                        <input id="colormode_switching" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Follow system</span>
+                    </label>
+                    <b>Dark Mode</b>
                     <br/>
-                    <label for="editortheme_dark">Editor</label>
-                    <select id="editortheme_dark">
-                        ${getFormSelectHTML([editorThemes_dark, editorThemes_light], ["dark", "light"])}
-                    </select>
-                <hr/>
-                <b>Light Mode</b>
-                <br/>
-                    <label for="overalltheme_light">Overall</label>
-                    <select id="overalltheme_light">
-                        ${getFormSelectHTML([overallThemes_light, overallThemes_dark], ["light", "dark"])}
-                    </select>
+                        <label for="overalltheme_dark">Overall</label>
+                        <select id="overalltheme_dark">
+                            ${getFormSelectHTML([overallThemes_dark, overallThemes_light], ["dark", "light"])}
+                        </select>
+                        <br/>
+                        <label for="editortheme_dark">Editor</label>
+                        <select id="editortheme_dark">
+                            ${getFormSelectHTML([editorThemes_dark, editorThemes_light], ["dark", "light"])}
+                        </select>
+                    <b>Light Mode</b>
                     <br/>
-                    <label for="editortheme_light">Editor</label>
-                    <select id="editortheme_light">
-                        ${getFormSelectHTML([editorThemes_light, editorThemes_dark], ["light", "dark"])}
-                    </select>
+                        <label for="overalltheme_light">Overall</label>
+                        <select id="overalltheme_light">
+                            ${getFormSelectHTML([overallThemes_light, overallThemes_dark], ["light", "dark"])}
+                        </select>
+                        <br/>
+                        <label for="editortheme_light">Editor</label>
+                        <select id="editortheme_light">
+                            ${getFormSelectHTML([editorThemes_light, editorThemes_dark], ["light", "dark"])}
+                        </select>
+                <hr/>
+                <h6>Wordcount Tracking</h6>
+                    <label class="settings-toggle">
+                        <input id="wordcount_tracking" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Tracking</span>
+                    </label>
+                    <br/>
+                    <label for="wordcount_interval">Checking interval in minutes:</label>
+                    <input type="number" id="wordcount_interval" min="1" max="1000">
+                    <br/>
+                    <label for="wordcount_dailytarget">Daily number of words target:</label>
+                    <input type="number" id="wordcount_dailytarget" min="0">
+                    <br/>
+                    <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, empty means no notification)</i></label>
+                    <input type="number" id="wordcount_notificationhour" min="0" max="23">
             </div>
         </form>`;
     if (document.querySelector("#left-menu")) {
+        // insert the HTML code
         document
             .querySelector("#left-menu")
             .getElementsByTagName("form")[0]
             .insertAdjacentHTML("afterend", settings_html);
+
+        // set the settings to their current values
         settings_form = document.querySelector("#native-overleaf-settings");
-        // load settings
         settings_form.querySelector("#notifications_chat").checked = up_notifications_chats;
         settings_form.querySelector("#notifications_comment").checked = up_notifications_comments;
         settings_form.querySelector("#notifications_comment_response").checked = up_notifications_comment_threads;
@@ -122,6 +142,11 @@ function setupPreferencesPane() {
         settings_form.querySelector("#overalltheme_light").value = up_overalltheme_light;
         settings_form.querySelector("#editortheme_dark").value = up_editortheme_dark;
         settings_form.querySelector("#editortheme_light").value = up_editortheme_light;
+        settings_form.querySelector("#wordcount_tracking").checked = up_wordcount_tracking;
+        settings_form.querySelector("#wordcount_interval").value = up_wordcount_interval;
+        settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
+        settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
+
         // listen for changes and trigger setting change handlers
         settings_form.addEventListener("change", function () {
             for (var id_key in settings_handler) {
@@ -141,9 +166,52 @@ var settings_handler = {
     overalltheme_light: set_overalltheme_light,
     editortheme_dark: set_editortheme_dark,
     editortheme_light: set_editortheme_light,
+    wordcount_tracking: set_wordcount_tracking,
+    wordcount_interval: set_wordcount_interval,
+    wordcount_dailytarget: set_wordcount_dailytarget,
+    wordcount_notificationhour: set_wordcount_notificationhour,
 };
 
-function set_notifications_chat(key, value, _) {
+function set_wordcount_tracking(key, value) {
+    console.log(key, value);
+    if (value.checked != up_wordcount_tracking) {
+        up_wordcount_tracking = value.checked;
+        settings_form.querySelector("#wordcount_interval").disabled = !up_wordcount_tracking;
+        settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
+        settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
+        if (up_wordcount_tracking == true) {
+            // register the wordcount tracking again
+            setupWordCount();
+        } else {
+            // remove the interval
+            destructWordCount();
+        }
+    }
+}
+
+function set_wordcount_interval(key, value) {
+    console.log(key, value);
+    if (value.value != up_wordcount_interval) {
+        up_wordcount_interval = value.value;
+        // register the wordcount tracking again so the new interval is used
+        destructWordCount();
+        setupWordCount();
+    }
+}
+
+function set_wordcount_dailytarget(key, value) {
+    console.log(key, value);
+    if (value.value != up_wordcount_dailytarget) {
+    }
+}
+
+function set_wordcount_notificationhour(key, value) {
+    console.log(key, value);
+    if (value.value != up_wordcount_notificationhour) {
+    }
+}
+
+function set_notifications_chat(key, value) {
     if (value != up_notifications_chats) {
         up_notifications_chats = value.checked;
         localStorage.setObject(key, value.checked);
@@ -153,7 +221,7 @@ function set_notifications_chat(key, value, _) {
     }
 }
 
-function set_notifications_comment(key, value, _) {
+function set_notifications_comment(key, value) {
     if (value.checked != up_notifications_comments) {
         up_notifications_comments = value.checked;
         localStorage.setObject(key, value.checked);
@@ -163,7 +231,7 @@ function set_notifications_comment(key, value, _) {
     }
 }
 
-function set_notifications_comment_response(key, value, _) {
+function set_notifications_comment_response(key, value) {
     if (value.checked != up_notifications_comment_threads) {
         up_notifications_comment_threads = value.checked;
         localStorage.setObject(key, value.checked);
@@ -173,7 +241,7 @@ function set_notifications_comment_response(key, value, _) {
     }
 }
 
-function set_colormode_switching(key, value, _) {
+function set_colormode_switching(key, value) {
     if (value.checked != up_colormode_switching) {
         up_colormode_switching = value.checked;
         localStorage.setObject(key, value.checked);

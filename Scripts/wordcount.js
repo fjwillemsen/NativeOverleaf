@@ -1,9 +1,4 @@
-up_keepwordcount = true;
-up_wordcountinterval = 15;
-up_wordcountdailytarget = 200;
-up_wordcountnotifyhour = 20;
-
-let wordcounts;
+// keep the ID of the interval timer so it can be removed later on
 let wordcount_timer_id;
 
 // recursively check whether the PDF has been compiled with four attempts accross an increasing waittime
@@ -91,28 +86,28 @@ async function updateWordCount() {
     const achieved_wordcount = wordcount - wordcounts[this.project_id][currentdate].earliest;
 
     // notify the user if the target number of words are reached
-    if (hasbeennotified == false && achieved_wordcount >= up_wordcountdailytarget) {
+    if (hasbeennotified == false && achieved_wordcount >= up_wordcount_dailytarget) {
         new Notification("Awesome, already met today's target!", {
             body: `You wrote ${achieved_wordcount} words, ${
-                achieved_wordcount - up_wordcountdailytarget
+                achieved_wordcount - up_wordcount_dailytarget
             } above target!`,
         });
         wordcounts[this.project_id][currentdate].hasbeennotified = true;
     }
 
     // notify the user if the target time is reached
-    if (hasbeennotified == false && up_wordcountnotifyhour !== undefined) {
+    if (hasbeennotified == false && up_wordcount_notificationhour !== undefined) {
         const currenttime = new Date();
-        if (currenttime.getHours() == up_wordcountnotifyhour) {
-            if (currenttime.getMinutes() <= up_wordcountinterval) {
-                if (achieved_wordcount < up_wordcountdailytarget) {
+        if (currenttime.getHours() == up_wordcount_notificationhour) {
+            if (currenttime.getMinutes() <= up_wordcount_interval) {
+                if (achieved_wordcount < up_wordcount_dailytarget) {
                     new Notification("You failed to meet today's target", {
-                        body: `You wrote ${achieved_wordcount} out of ${up_wordcountdailytarget} words.`,
+                        body: `You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words.`,
                     });
                 } else {
                     new Notification("Congrats, you met today's target!", {
                         body: `You wrote ${achieved_wordcount} words, ${
-                            achieved_wordcount - up_wordcountdailytarget
+                            achieved_wordcount - up_wordcount_dailytarget
                         } above target!`,
                     });
                 }
@@ -127,19 +122,19 @@ async function updateWordCount() {
 
 // setup the repeated execution of updateWordCount
 function setupWordCount() {
-    if (up_keepwordcount == true) {
+    if (up_wordcount_tracking == true) {
         if (this.project_id === undefined) {
             console.warn("Project ID is not defined, unable to keep word count");
             return;
         }
         updateWordCount();
-        wordcount_timer_id = setInterval(updateWordCount, 10 * 1000); // up_wordcountinterval * 60 * 1000
+        wordcount_timer_id = setInterval(updateWordCount, 10 * 1000); // up_wordcount_interval * 60 * 1000
     }
 }
 
 // stop the repeated execution of updateWordCount
 function destructWordCount() {
-    if (up_keepwordcount == false && wordcount_timer_id !== undefined) {
+    if (up_wordcount_tracking == false && wordcount_timer_id !== undefined) {
         clearInterval(wordcount_timer_id);
     }
 }
