@@ -60,3 +60,8 @@ function setAutoUpdateChecking() {
         };
     }
 }
+
+// export functions for unit testing
+if (typeof exports !== "undefined") {
+    module.exports = { fetchAsync, semanticVersionCompare };
+}
