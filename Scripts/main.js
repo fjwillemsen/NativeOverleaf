@@ -5,6 +5,9 @@ let comments_watcher_unbind;
 let chat_observer;
 let colorscheme;
 
+// set whether external libraries are loaded
+let lib_chartjs_loaded = false;
+
 // get app version
 <<insert="appversion.js">>
 
@@ -36,8 +39,10 @@ if (window.matchMedia) {
 <<insert="update.js">>
 <<insert="wordcount.js">>
 <<insert="backup.js">>
+<<insert="chart.js">>
 
 // start
+const startTime = performance.now();
 setupColormode()
 setupNotifications()
 setupPreferencesPane()
@@ -45,3 +50,6 @@ addCSS()
 setAutoUpdateChecking()
 setupWordCount()
 // setupBackup()
+setupCharts()
+const endTime = performance.now();
+console.log(`Native Overleaf injected setup took ${endTime - startTime} milliseconds`);
