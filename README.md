@@ -20,6 +20,7 @@ However, would it not be even better if it were to behave like a native app on y
 - [Troubleshooting](#troubleshooting)
   - [Institutional login](#institutional-login)
   - [Unable to open on Mac](#unable-to-open-on-mac)
+  - [Wordcounts & projects](#wordcounts--projects)
 - [Compile your own](#compile-your-own)
 - [Ideas, questions, contributions?](#ideas-questions-contributions)
 
@@ -84,6 +85,11 @@ This has been fixed in v1.4.0. If you encounter a related issue, look at [issue 
 If you get the message that "Apple can't verify this app doesn't contain malware", use right-click -> open to open it. 
 If you get "This app is damaged and can't be opened", download the archive again and unzip it using Finder's built-in Archive Utility or [ditto](https://ss64.com/osx/ditto.html) (otherwise codesigning metadata may be lost). 
 
+### Wordcounts & projects
+Currently, the wordcount tracking settings are globally. 
+In the future we can change this to per-project settings. 
+If you want this, please [create an issue](https://github.com/fjwillemsen/NativeOverleaf/issues/new). 
+
 
 ## Compile your own
 Want to adjust some settings or just build from scratch for your device? Easily create your own native version of Overleaf!
@@ -91,7 +97,7 @@ In just four easy steps you can compile Overleaf as a native app for your device
 
 - Step 1: open your terminal and `cd` to wherever you want to install Overleaf. 
 - Step 2: download this repository (e.g. `git clone https://github.com/fjwillemsen/NativeOverleaf.git`).
-- Step 3: install nativefier, for example using `brew install nativefier`. If you want to change the JavaScript, also install [Terser](https://github.com/terser/terser). 
+- Step 3: install the package.json dependencies, and optionally the devDependencies if you want to change the JavaScript code. 
 - Step 4: use the `compile-all.sh` script (without codesigning) for inspiration, executing and modifying the commands as needed. Alternatively (not recommended), run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject bundled_script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. If you do not intend to distribute the app, leave out the codesigning, otherwise create your own self-signed certificate. 
 
 After being built, the app appears in the folder - you can copy it to another location if desired. 

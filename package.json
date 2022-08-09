@@ -1,0 +1,34 @@
+{
+  "name": "native-overleaf",
+  "version": "1.4.0",
+  "description": "Next-level academia by extending Overleaf in a native package.",
+  "main": "bundled_script.js",
+  "scripts": {
+    "test": "jest --coverage --notify --config=jest.config.js ./Tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fjwillemsen/NativeOverleaf.git"
+  },
+  "keywords": [
+    "Overleaf",
+    "Nativefier",
+    "Electron",
+    "academia",
+    "LaTex"
+  ],
+  "author": "Floris-Jan Willemsen",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/fjwillemsen/NativeOverleaf/issues"
+  },
+  "homepage": "https://github.com/fjwillemsen/NativeOverleaf#readme",
+  "dependencies": {
+    "nativefier": "^49.0.0"
+  },
+  "devDependencies": {
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
+    "terser": "^5.14.2"
+  }
+}
