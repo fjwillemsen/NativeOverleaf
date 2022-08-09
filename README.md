@@ -29,6 +29,7 @@ However, would it not be even better if it were to behave like a native app on y
 - [x] notifications of chats, comments and comment threads
 - [x] preferences pane integrated in the Overleaf sidemenu
 - [x] automatic update checking
+- [x] words-per-day tracker & reminder (useful for the 200-words-per-day-doctrine)
 
 <p float="left">
     <img src="Assets/showcase/notifications/badgecount.png" alt="notification badgecount">
@@ -38,9 +39,9 @@ However, would it not be even better if it were to behave like a native app on y
 
 
 ## Next Features
-- [ ] automated local backups of projects (planned for next version)
+- [ ] words-per-day graph (planned for next version)
+- [ ] automated local backups of projects (planned for future version)
 - [ ] notifications for tracked changes (planned for future version)
-- [ ] words-per-day tracker / reminder: useful for the 200-words-per-day-doctrine (planned for future version)
 - [ ] integrate Writeful for Overleaf (future version if technically possible) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
 
 [Looking to contribute?](#ideas-questions-contributions)
