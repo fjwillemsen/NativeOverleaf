@@ -37,7 +37,7 @@ function setupNotifications() {
 
         // set watch on comment threads
         if (up_notifications_comments == true) {
-            comments_scope = angular.element("[ng-controller=ReviewPanelController]").scope();
+            let comments_scope = angular.element("[ng-controller=ReviewPanelController]").scope();
             // if the ReviewPanelController is in scope, set a watcher
             if (comments_scope) {
                 // if there are new comments, find the new ones and emit a notification for it
@@ -47,14 +47,14 @@ function setupNotifications() {
                 comments_watcher_unbind = comments_scope.$watch(
                     "reviewPanel.commentThreads",
                     function (newVal, oldVal) {
-                        diffs = deepDiffMapper.map(oldVal, newVal);
+                        const diffs = deepDiffMapper.map(oldVal, newVal);
                         for (const diff_key in diffs) {
                             // unpack payload
-                            var payload = diffs[diff_key];
+                            let payload = diffs[diff_key];
 
                             // when a comment is resolved
                             if (payload.resolved && payload.resolved_at && payload.resolved_by_user) {
-                                user = payload.resolved_by_user.updated;
+                                const user = payload.resolved_by_user.updated;
                                 // check if this is newer than the last reset and if the user did not do it themselves
                                 if (
                                     new Date(payload.resolved_at.updated) > lastNotificationResetTimestamp &&
@@ -65,15 +65,15 @@ function setupNotifications() {
                             }
 
                             // new comment threads and new comments in a thread use the same structure
-                            var actionText = "responded to a comment";
+                            let actionText = "responded to a comment";
                             if (payload.updated) {
                                 payload = payload.updated;
                                 actionText = "commented";
                             }
-                            messages = payload.messages;
+                            const messages = payload.messages;
                             for (const message_index in messages) {
                                 // unpack message
-                                var message = messages[message_index];
+                                let message = messages[message_index];
                                 if (message.updated) {
                                     message = message.updated;
                                     // if notifications of comment threads are not enabled, skip this message   (TODO check if it is safe to break here?)
@@ -100,7 +100,7 @@ function setupNotifications() {
 
         // set watch on chat
         if (up_notifications_chats == true) {
-            chat_scope = angular.element('[class="infinite-scroll messages"]').children().children();
+            let chat_scope = angular.element('[class="infinite-scroll messages"]').children().children();
             if (chat_scope && chat_scope.length && chat_scope[1]) {
                 if (chat_observer === undefined) {
                     chat_observer = new MutationObserver(function (mutations) {

@@ -1,10 +1,10 @@
-backup_types = ["Source", "PDF"];
-up_backup = true;
-up_backup_type = 0;
+const backup_types = ["Source", "PDF"];
+let up_backup = true;
+let up_backup_type = 0;
 
 function getBackupLink(backup_type_index) {
     if (document.querySelector("#left-menu")) {
-        backup_source_html = document
+        const backup_source_html = document
             .querySelector("#left-menu")
             .getElementsByClassName("nav-downloads")[0]
             .getElementsByTagName("li")[backup_type_index];

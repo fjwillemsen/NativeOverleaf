@@ -1,13 +1,13 @@
 // This file is not intended to run by itself, but is inserted into main.js
 
 // Overleaf has weird designators for the overall theme, so we use more descriptive ones internally
-var overallThemeToOverleaf = {
+const overallThemeToOverleaf = {
     dark: "",
     light: "light-",
 };
 
 function switchColorMode() {
-    scope = angular.element("[ng-controller=SettingsController]").scope();
+    let scope = angular.element("[ng-controller=SettingsController]").scope();
     if (scope) {
         if (current_colorscheme_preference == "dark") {
             scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_dark];

@@ -1,9 +1,9 @@
 // This file acts as a template where the contents of other files (mostly JS scripts) can be inserted using <<insert ="file">> (note the double quotes), compiled into bundled_script.js
 
 // register links to watchers for removal / reactivation
-var comments_watcher_unbind
-var chat_observer
-var colorscheme
+let comments_watcher_unbind;
+let chat_observer;
+let colorscheme;
 
 // get app version
 <<insert="appversion.js">>
@@ -17,12 +17,13 @@ catch(e) {
 }
 
 // global variables
-var notificationCounter = 0
-var lastNotificationResetTimestamp = Date.now()
+let notificationCounter = 0
+let lastNotificationResetTimestamp = Date.now()
 const originalDocumentTitle = document.title
+let current_colorscheme_preference;
 if (window.matchMedia) {
-    colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
-    var current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
+    let colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
+    current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
 }
 
 // insert partial files

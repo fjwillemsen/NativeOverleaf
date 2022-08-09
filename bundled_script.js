@@ -1,9 +1,9 @@
 // This file acts as a template where the contents of other files (mostly JS scripts) can be inserted using <<insert ="file">> (note the double quotes), compiled into bundled_script.js
 
 // register links to watchers for removal / reactivation
-var comments_watcher_unbind
-var chat_observer
-var colorscheme
+let comments_watcher_unbind;
+let chat_observer;
+let colorscheme;
 
 // get app version
 // Contents Inserted from appversion.js
@@ -18,12 +18,13 @@ catch(e) {
 }
 
 // global variables
-var notificationCounter = 0
-var lastNotificationResetTimestamp = Date.now()
+let notificationCounter = 0
+let lastNotificationResetTimestamp = Date.now()
 const originalDocumentTitle = document.title
+let current_colorscheme_preference;
 if (window.matchMedia) {
-    colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
-    var current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
+    let colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
+    current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
 }
 
 // insert partial files
@@ -35,7 +36,7 @@ Storage.prototype.setObject = function (key, value) {
     this.setItem(key, JSON.stringify(value));
 };
 Storage.prototype.getObject = function (key) {
-    var value = this.getItem(key);
+    const value = this.getItem(key);
     return value && JSON.parse(value);
 };
 
@@ -52,7 +53,7 @@ function recursiveCheckAndWait(
     multiplyWaitTime = false,
     numberOfTimesChecked = 0
 ) {
-    checkFunctionResult = checkFunction();
+    const checkFunctionResult = checkFunction();
     numberOfTimesChecked += 1;
     if (checkFunctionResult != false) {
         // if the function does not return false, return its value
@@ -83,7 +84,7 @@ function recursiveCheckAndWait(
 }
 
 // function for mapping the difference between two objects
-var deepDiffMapper = (function () {
+const deepDiffMapper = (function () {
     return {
         VALUE_CREATED: "created",
         VALUE_UPDATED: "updated",
@@ -105,14 +106,14 @@ var deepDiffMapper = (function () {
                 return undefined;
             }
 
-            var diff = {};
+            let diff = {};
             let foundKeys = {};
-            for (var key in obj1) {
+            for (let key in obj1) {
                 if (this.isFunction(obj1[key])) {
                     continue;
                 }
 
-                var value2 = undefined;
+                let value2 = undefined;
                 if (obj2[key] !== undefined) {
                     value2 = obj2[key];
                 }
@@ -123,7 +124,7 @@ var deepDiffMapper = (function () {
                     diff[key] = mapValue;
                 }
             }
-            for (var key in obj2) {
+            for (let key in obj2) {
                 if (this.isFunction(obj2[key]) || foundKeys[key] !== undefined) {
                     continue;
                 }
@@ -216,16 +217,19 @@ let up_wordcount_dailytarget_max = 2147483647;
 let up_wordcount_notificationhour_min = 0;
 let up_wordcount_notificationhour_max = 23;
 
+// settings form
+let settings_form;
+
 function getFormSelectHTML(category_dicts, category_names) {
-    var str = "";
+    let str = "";
     for (category_index in category_dicts) {
-        var endstr = "";
+        let endstr = "";
         if (category_names.length - 1 >= category_index) {
             str += `<optgroup label="${category_names[category_index]}">`;
             endstr += "</optgroup>";
         }
         category_dict = category_dicts[category_index];
-        for (var key in category_dict) {
+        for (let key in category_dict) {
             val = category_dict[key];
             str += `<option value="${key}">${val}</option>\n`;
         }
@@ -345,7 +349,7 @@ function setupPreferencesPane() {
 
         // listen for changes and trigger setting change handlers
         settings_form.addEventListener("change", function () {
-            for (var id_key in settings_handler) {
+            for (let id_key in settings_handler) {
                 settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`));
             }
         });
@@ -353,7 +357,7 @@ function setupPreferencesPane() {
 }
 
 // setting handlers
-var settings_handler = {
+const settings_handler = {
     notifications_chat: set_notifications_chat,
     notifications_comment: set_notifications_comment,
     notifications_comment_response: set_notifications_comment_response,
@@ -478,7 +482,7 @@ function set_colormode_switching(key, value) {
 }
 
 function themesetter(user_preference_variable_name, key, value) {
-    user_preference_variable = eval(user_preference_variable_name);
+    const user_preference_variable = eval(user_preference_variable_name);
     localStorage.setObject(key, value.value);
     if (value.value != user_preference_variable) {
         // set the "up_.*" variable programmatically because switchColorMode needs it before we can return it
@@ -506,13 +510,13 @@ function set_editortheme_light(key, value) {
 // This file is not intended to run by itself, but is inserted into main.js
 
 // Overleaf has weird designators for the overall theme, so we use more descriptive ones internally
-var overallThemeToOverleaf = {
+const overallThemeToOverleaf = {
     dark: "",
     light: "light-",
 };
 
 function switchColorMode() {
-    scope = angular.element("[ng-controller=SettingsController]").scope();
+    let scope = angular.element("[ng-controller=SettingsController]").scope();
     if (scope) {
         if (current_colorscheme_preference == "dark") {
             scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_dark];
@@ -584,7 +588,7 @@ function setupNotifications() {
 
         // set watch on comment threads
         if (up_notifications_comments == true) {
-            comments_scope = angular.element("[ng-controller=ReviewPanelController]").scope();
+            let comments_scope = angular.element("[ng-controller=ReviewPanelController]").scope();
             // if the ReviewPanelController is in scope, set a watcher
             if (comments_scope) {
                 // if there are new comments, find the new ones and emit a notification for it
@@ -594,14 +598,14 @@ function setupNotifications() {
                 comments_watcher_unbind = comments_scope.$watch(
                     "reviewPanel.commentThreads",
                     function (newVal, oldVal) {
-                        diffs = deepDiffMapper.map(oldVal, newVal);
+                        const diffs = deepDiffMapper.map(oldVal, newVal);
                         for (const diff_key in diffs) {
                             // unpack payload
-                            var payload = diffs[diff_key];
+                            let payload = diffs[diff_key];
 
                             // when a comment is resolved
                             if (payload.resolved && payload.resolved_at && payload.resolved_by_user) {
-                                user = payload.resolved_by_user.updated;
+                                const user = payload.resolved_by_user.updated;
                                 // check if this is newer than the last reset and if the user did not do it themselves
                                 if (
                                     new Date(payload.resolved_at.updated) > lastNotificationResetTimestamp &&
@@ -612,15 +616,15 @@ function setupNotifications() {
                             }
 
                             // new comment threads and new comments in a thread use the same structure
-                            var actionText = "responded to a comment";
+                            let actionText = "responded to a comment";
                             if (payload.updated) {
                                 payload = payload.updated;
                                 actionText = "commented";
                             }
-                            messages = payload.messages;
+                            const messages = payload.messages;
                             for (const message_index in messages) {
                                 // unpack message
-                                var message = messages[message_index];
+                                let message = messages[message_index];
                                 if (message.updated) {
                                     message = message.updated;
                                     // if notifications of comment threads are not enabled, skip this message   (TODO check if it is safe to break here?)
@@ -647,7 +651,7 @@ function setupNotifications() {
 
         // set watch on chat
         if (up_notifications_chats == true) {
-            chat_scope = angular.element('[class="infinite-scroll messages"]').children().children();
+            let chat_scope = angular.element('[class="infinite-scroll messages"]').children().children();
             if (chat_scope && chat_scope.length && chat_scope[1]) {
                 if (chat_observer === undefined) {
                     chat_observer = new MutationObserver(function (mutations) {
@@ -788,7 +792,7 @@ function addCSS() {
             top: 2px;
         }
     `;
-    var styleSheet = document.createElement("style");
+    let styleSheet = document.createElement("style");
     styleSheet.innerText = css_text;
     document.head.appendChild(styleSheet);
 }
@@ -809,36 +813,36 @@ function semanticVersionCompare(a, b) {
 }
 
 async function checkForUpdate(reportAll = false) {
-    tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
+    const tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
     if (!tags.length || tags.length === undefined) {
         console.error("Can not retrieve latest version for update checking");
         return;
     }
-    latest_version = tags[0].name.replace("v", "");
-    comparison = semanticVersionCompare(latest_version, appversion);
+    const latest_version = tags[0].name.replace("v", "");
+    const comparison = semanticVersionCompare(latest_version, appversion);
     if (comparison == 0 && comparison !== "") {
         console.log("Update check completed, no update available.");
         if (reportAll == true) {
             alert("You're up to date with the latest version!");
         }
     } else if (comparison == 1) {
-        goToUpdate = confirm(`Update available! 
+        const goToUpdate = confirm(`Update available! 
             Current: ${appversion}, latest: ${latest_version}.
             Go to downloads page?`);
         if (goToUpdate) {
             window.open("https://github.com/fjwillemsen/NativeOverleaf/releases/latest/");
         }
     } else if (comparison == -1) {
-        result = `No update needed, current version (${appversion}) is newer than latest publicly available version (${latest_version}).`;
-        console.log(result);
+        const result_text = `No update needed, current version (${appversion}) is newer than latest publicly available version (${latest_version}).`;
+        console.log(result_text);
         if (reportAll == true) {
-            alert(result);
+            alert(result_text);
         }
     } else {
-        result = `Invalid semantic version comparison outcome: ${comparison}`;
-        console.log(result);
+        const result_text = `Invalid semantic version comparison outcome: ${comparison}`;
+        console.log(result_text);
         if (reportAll == true) {
-            alert(result);
+            alert(result_text);
         }
     }
 }
@@ -1010,7 +1014,7 @@ let up_backup_type = 0;
 
 function getBackupLink(backup_type_index) {
     if (document.querySelector("#left-menu")) {
-        backup_source_html = document
+        const backup_source_html = document
             .querySelector("#left-menu")
             .getElementsByClassName("nav-downloads")[0]
             .getElementsByTagName("li")[backup_type_index];

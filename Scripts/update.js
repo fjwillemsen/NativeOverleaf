@@ -14,36 +14,36 @@ function semanticVersionCompare(a, b) {
 }
 
 async function checkForUpdate(reportAll = false) {
-    tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
+    const tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
     if (!tags.length || tags.length === undefined) {
         console.error("Can not retrieve latest version for update checking");
         return;
     }
-    latest_version = tags[0].name.replace("v", "");
-    comparison = semanticVersionCompare(latest_version, appversion);
+    const latest_version = tags[0].name.replace("v", "");
+    const comparison = semanticVersionCompare(latest_version, appversion);
     if (comparison == 0 && comparison !== "") {
         console.log("Update check completed, no update available.");
         if (reportAll == true) {
             alert("You're up to date with the latest version!");
         }
     } else if (comparison == 1) {
-        goToUpdate = confirm(`Update available! 
+        const goToUpdate = confirm(`Update available! 
             Current: ${appversion}, latest: ${latest_version}.
             Go to downloads page?`);
         if (goToUpdate) {
             window.open("https://github.com/fjwillemsen/NativeOverleaf/releases/latest/");
         }
     } else if (comparison == -1) {
-        result = `No update needed, current version (${appversion}) is newer than latest publicly available version (${latest_version}).`;
-        console.log(result);
+        const result_text = `No update needed, current version (${appversion}) is newer than latest publicly available version (${latest_version}).`;
+        console.log(result_text);
         if (reportAll == true) {
-            alert(result);
+            alert(result_text);
         }
     } else {
-        result = `Invalid semantic version comparison outcome: ${comparison}`;
-        console.log(result);
+        const result_text = `Invalid semantic version comparison outcome: ${comparison}`;
+        console.log(result_text);
         if (reportAll == true) {
-            alert(result);
+            alert(result_text);
         }
     }
 }

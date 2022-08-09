@@ -5,7 +5,7 @@ Storage.prototype.setObject = function (key, value) {
     this.setItem(key, JSON.stringify(value));
 };
 Storage.prototype.getObject = function (key) {
-    var value = this.getItem(key);
+    const value = this.getItem(key);
     return value && JSON.parse(value);
 };
 
@@ -22,7 +22,7 @@ function recursiveCheckAndWait(
     multiplyWaitTime = false,
     numberOfTimesChecked = 0
 ) {
-    checkFunctionResult = checkFunction();
+    const checkFunctionResult = checkFunction();
     numberOfTimesChecked += 1;
     if (checkFunctionResult != false) {
         // if the function does not return false, return its value
@@ -53,7 +53,7 @@ function recursiveCheckAndWait(
 }
 
 // function for mapping the difference between two objects
-var deepDiffMapper = (function () {
+const deepDiffMapper = (function () {
     return {
         VALUE_CREATED: "created",
         VALUE_UPDATED: "updated",
@@ -75,14 +75,14 @@ var deepDiffMapper = (function () {
                 return undefined;
             }
 
-            var diff = {};
+            let diff = {};
             let foundKeys = {};
-            for (var key in obj1) {
+            for (let key in obj1) {
                 if (this.isFunction(obj1[key])) {
                     continue;
                 }
 
-                var value2 = undefined;
+                let value2 = undefined;
                 if (obj2[key] !== undefined) {
                     value2 = obj2[key];
                 }
@@ -93,7 +93,7 @@ var deepDiffMapper = (function () {
                     diff[key] = mapValue;
                 }
             }
-            for (var key in obj2) {
+            for (let key in obj2) {
                 if (this.isFunction(obj2[key]) || foundKeys[key] !== undefined) {
                     continue;
                 }

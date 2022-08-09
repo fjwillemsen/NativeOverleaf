@@ -57,7 +57,7 @@ function addCSS() {
             top: 2px;
         }
     `;
-    var styleSheet = document.createElement("style");
+    let styleSheet = document.createElement("style");
     styleSheet.innerText = css_text;
     document.head.appendChild(styleSheet);
 }

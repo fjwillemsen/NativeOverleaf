@@ -41,16 +41,19 @@ let up_wordcount_dailytarget_max = 2147483647;
 let up_wordcount_notificationhour_min = 0;
 let up_wordcount_notificationhour_max = 23;
 
+// settings form
+let settings_form;
+
 function getFormSelectHTML(category_dicts, category_names) {
-    var str = "";
+    let str = "";
     for (category_index in category_dicts) {
-        var endstr = "";
+        let endstr = "";
         if (category_names.length - 1 >= category_index) {
             str += `<optgroup label="${category_names[category_index]}">`;
             endstr += "</optgroup>";
         }
         category_dict = category_dicts[category_index];
-        for (var key in category_dict) {
+        for (let key in category_dict) {
             val = category_dict[key];
             str += `<option value="${key}">${val}</option>\n`;
         }
@@ -170,7 +173,7 @@ function setupPreferencesPane() {
 
         // listen for changes and trigger setting change handlers
         settings_form.addEventListener("change", function () {
-            for (var id_key in settings_handler) {
+            for (let id_key in settings_handler) {
                 settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`));
             }
         });
@@ -178,7 +181,7 @@ function setupPreferencesPane() {
 }
 
 // setting handlers
-var settings_handler = {
+const settings_handler = {
     notifications_chat: set_notifications_chat,
     notifications_comment: set_notifications_comment,
     notifications_comment_response: set_notifications_comment_response,
@@ -303,7 +306,7 @@ function set_colormode_switching(key, value) {
 }
 
 function themesetter(user_preference_variable_name, key, value) {
-    user_preference_variable = eval(user_preference_variable_name);
+    const user_preference_variable = eval(user_preference_variable_name);
     localStorage.setObject(key, value.value);
     if (value.value != user_preference_variable) {
         // set the "up_.*" variable programmatically because switchColorMode needs it before we can return it
