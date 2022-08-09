@@ -38,7 +38,7 @@ let up_wordcount_interval_min = 1;
 let up_wordcount_interval_max = 360;
 let up_wordcount_dailytarget_min = 1;
 let up_wordcount_dailytarget_max = 2147483647;
-let up_wordcount_notificationhour_min = 0;
+let up_wordcount_notificationhour_min = -1;
 let up_wordcount_notificationhour_max = 23;
 
 // settings form
@@ -136,7 +136,7 @@ function setupPreferencesPane() {
                     <label for="wordcount_dailytarget">Daily number of words target:<br/><i>(0 means no target)</i></label>
                     <input type="number" id="wordcount_dailytarget" min="${up_wordcount_dailytarget_min}" max="${up_wordcount_dailytarget_max}">
                     <br/>
-                    <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, empty means no notification)</i></label>
+                    <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, -1 means no notification)</i></label>
                     <input type="number" id="wordcount_notificationhour" min="${up_wordcount_notificationhour_min}" max="${up_wordcount_notificationhour_max}">
             </div>
         </form>`;

@@ -86,7 +86,7 @@ async function updateWordCount() {
     const achieved_wordcount = wordcount - wordcounts[this.project_id][currentdate].earliest;
 
     // notify the user if the target number of words are reached
-    if (hasbeennotified == false && achieved_wordcount >= up_wordcount_dailytarget) {
+    if (hasbeennotified == false && up_wordcount_dailytarget > 0 && achieved_wordcount >= up_wordcount_dailytarget) {
         new Notification("Awesome, already met today's target!", {
             body: `You wrote ${achieved_wordcount} words, ${
                 achieved_wordcount - up_wordcount_dailytarget
@@ -96,11 +96,13 @@ async function updateWordCount() {
     }
 
     // notify the user if the target time is reached
-    if (hasbeennotified == false && up_wordcount_notificationhour !== undefined) {
+    if (hasbeennotified == false && up_wordcount_notificationhour > -1) {
         const currenttime = new Date();
         if (currenttime.getHours() == up_wordcount_notificationhour) {
             if (currenttime.getMinutes() <= up_wordcount_interval) {
-                if (achieved_wordcount < up_wordcount_dailytarget) {
+                if (up_wordcount_dailytarget <= 0) {
+                    new Notification(`You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words today.`);
+                } else if (achieved_wordcount < up_wordcount_dailytarget) {
                     new Notification("You failed to meet today's target", {
                         body: `You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words.`,
                     });

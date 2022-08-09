@@ -42,7 +42,7 @@ However, would it not be even better if it were to behave like a native app on y
 - [ ] words-per-day graph (planned for next version)
 - [ ] automated local backups of projects (planned for future version)
 - [ ] notifications for tracked changes (planned for future version)
-- [ ] integrate Writeful for Overleaf (future version if technically possible) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
+- [ ] integrate Writeful for Overleaf extension (future version if technically possible) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
 
 [Looking to contribute?](#ideas-questions-contributions)
 
@@ -52,7 +52,7 @@ However, would it not be even better if it were to behave like a native app on y
 - Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the background, so you will not get notifications while working in a project. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
 
 ## How it works
-Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native feature with a large number of supported platforms. 
+Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native feature with a large number of supported platforms. <!-- may switch to [Multi](https://github.com/kofigumbs/multi#purchasing) in the future -->
 
 ## Download binary
 If there is interest in this project, I will add it to Homebrew for easy updates. 
@@ -78,8 +78,7 @@ If your platform / architecture is missing, let me know via the [discussions pag
 If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
 
 ### Institutional login
-If you have trouble [logging in through your institution](https://www.overleaf.com/institutional-login) because it opens in your OS browser, this is a [known issue](https://github.com/fjwillemsen/NativeOverleaf/issues/3) I'm working to fix. In the meantime, you can circumvent this issue by logging in to Overleaf in your browser, going to [settings](https://www.overleaf.com/user/settings) and adding your institution email address. 
-This allows you to use the institution email address in the normal login in the app. 
+This has been fixed in v1.4.0. If you encounter a related issue, look at [issue #3](https://github.com/fjwillemsen/NativeOverleaf/issues/3) or open a new issue. 
 
 ### Unable to open on Mac
 If you get the message that "Apple can't verify this app doesn't contain malware", use right-click -> open to open it. 
@@ -92,8 +91,8 @@ In just four easy steps you can compile Overleaf as a native app for your device
 
 - Step 1: open your terminal and `cd` to wherever you want to install Overleaf. 
 - Step 2: download this repository (e.g. `git clone https://github.com/fjwillemsen/NativeOverleaf.git`).
-- Step 3: install nativefier, for example using `brew install nativefier`. 
-- Step 4: use the `compile-all.sh` script (without codesigning) for inspiration or run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. If you do not intend to distribute the app, leave out the codesigning, otherwise create your own self-signed certificate. 
+- Step 3: install nativefier, for example using `brew install nativefier`. If you want to change the JavaScript, also install [Terser](https://github.com/terser/terser). 
+- Step 4: use the `compile-all.sh` script (without codesigning) for inspiration, executing and modifying the commands as needed. Alternatively (not recommended), run `nativefier 'https://overleaf.com' --name 'Overleaf' --app-version <latest version> --darwin-dark-mode-support --inject bundled_script.js --icon Icon/<select icon>`. If you have an Apple Silicon (M1/M2) Mac, be sure to add `--arch arm64` as Homebrew may still be an Intel process in some cases. If you do not intend to distribute the app, leave out the codesigning, otherwise create your own self-signed certificate. 
 
 After being built, the app appears in the folder - you can copy it to another location if desired. 
 

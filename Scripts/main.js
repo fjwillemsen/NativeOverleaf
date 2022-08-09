@@ -12,7 +12,7 @@ let colorscheme;
 try { angular; } 
 catch(e) {
     if(e.name == "ReferenceError") {
-        return;
+        throw new Error("Angular is not present on this page, Native Overleaf will not be active here");
     }
 }
 
