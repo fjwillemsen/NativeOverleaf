@@ -7,6 +7,18 @@ echo "Bundling scripts"
 /bin/bash bundle_scripts.sh
 cd ..
 
+# statically validate the syntax
+echo "Statically validating bundled script"
+validated=$(node --check bundled_script.js 2>&1)
+if [ -z "$validated" ]
+then
+    echo "| valid"
+else
+    echo "| invalid bundled_script.js, reason:"
+    echo $validated
+    exit 1
+fi
+
 # minify the bundled_script.js file
 echo "Minifying bundled script"
 terser bundled_script.js --compress --output bundled_script.js  # use --timings to see how long each step takes
