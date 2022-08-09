@@ -208,6 +208,14 @@ let up_wordcount_interval = localStorage.getObject("wordcount_interval") || 15; 
 let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget") || 200; // net number of words that must be produced daily
 let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour") || 18; // hour of the day at which the user is notified whether they have achieved their goal
 
+// user preferences boundaries
+let up_wordcount_interval_min = 1;
+let up_wordcount_interval_max = 360;
+let up_wordcount_dailytarget_min = 1;
+let up_wordcount_dailytarget_max = 2147483647;
+let up_wordcount_notificationhour_min = 0;
+let up_wordcount_notificationhour_max = 23;
+
 function getFormSelectHTML(category_dicts, category_names) {
     var str = "";
     for (category_index in category_dicts) {
@@ -260,7 +268,8 @@ function setupPreferencesPane() {
                         <div class="settings-toggle-switch"></div>
                         <span class="settings-toggle-label">Follow system</span>
                     </label>
-                    <hr/>
+                    <br/>
+                    <br/>
                     <b>Dark Mode</b>
                     <br/>
                         <label for="overalltheme_dark">Overall</label>
@@ -272,7 +281,8 @@ function setupPreferencesPane() {
                         <select id="editortheme_dark">
                             ${getFormSelectHTML([editorThemes_dark, editorThemes_light], ["dark", "light"])}
                         </select>
-                    <hr/>
+                    <br/>
+                    <br/>
                     <b>Light Mode</b>
                     <br/>
                         <label for="overalltheme_light">Overall</label>
@@ -293,13 +303,13 @@ function setupPreferencesPane() {
                     </label>
                     <br/>
                     <label for="wordcount_interval">Checking interval in minutes:</label>
-                    <input type="number" id="wordcount_interval" min="1" max="1000">
+                    <input type="number" id="wordcount_interval" min="${up_wordcount_interval_min}" max="${up_wordcount_interval_max}">
                     <br/>
-                    <label for="wordcount_dailytarget">Daily number of words target:</label>
-                    <input type="number" id="wordcount_dailytarget" min="0">
+                    <label for="wordcount_dailytarget">Daily number of words target:<br/><i>(0 means no target)</i></label>
+                    <input type="number" id="wordcount_dailytarget" min="${up_wordcount_dailytarget_min}" max="${up_wordcount_dailytarget_max}">
                     <br/>
-                    <label for="wordcount_notificationhour">Hour of daily notification<br/><i>(0 to 23, empty means no notification)</i>:</label>
-                    <input type="number" id="wordcount_notificationhour" min="0" max="23">
+                    <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, empty means no notification)</i></label>
+                    <input type="number" id="wordcount_notificationhour" min="${up_wordcount_notificationhour_min}" max="${up_wordcount_notificationhour_max}">
             </div>
         </form>`;
     if (document.querySelector("#left-menu")) {
@@ -323,6 +333,15 @@ function setupPreferencesPane() {
         settings_form.querySelector("#wordcount_interval").value = up_wordcount_interval;
         settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
         settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
+
+        // set the disabled values where necessary
+        settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
+        settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
+        settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
+        settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
+        settings_form.querySelector("#wordcount_interval").disabled = !up_wordcount_tracking;
+        settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
+        settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
 
         // listen for changes and trigger setting change handlers
         settings_form.addEventListener("change", function () {
@@ -350,9 +369,9 @@ var settings_handler = {
 };
 
 function set_wordcount_tracking(key, value) {
-    console.log(key, value);
     if (value.checked != up_wordcount_tracking) {
         up_wordcount_tracking = value.checked;
+        localStorage.setObject(key, value.checked);
         settings_form.querySelector("#wordcount_interval").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
@@ -367,9 +386,14 @@ function set_wordcount_tracking(key, value) {
 }
 
 function set_wordcount_interval(key, value) {
-    console.log(key, value);
-    if (value.value != up_wordcount_interval) {
+    if (value.value < up_wordcount_interval_min || value.value > up_wordcount_interval_max) {
+        alert(
+            `You set ${value.value}, but wordcount interval must be between ${up_wordcount_interval_min} and ${up_wordcount_interval_max}`
+        );
+        settings_form.querySelector(`#${key}`).value = up_wordcount_interval;
+    } else if (value.value != up_wordcount_interval) {
         up_wordcount_interval = value.value;
+        localStorage.setObject(key, value.value);
         // register the wordcount tracking again so the new interval is used
         destructWordCount();
         setupWordCount();
@@ -377,14 +401,31 @@ function set_wordcount_interval(key, value) {
 }
 
 function set_wordcount_dailytarget(key, value) {
-    console.log(key, value);
-    if (value.value != up_wordcount_dailytarget) {
+    if (value.value < up_wordcount_dailytarget_min || value.value > up_wordcount_dailytarget_max) {
+        alert(
+            `You set ${value.value}, but wordcount daily target must be between ${up_wordcount_dailytarget_min} and ${up_wordcount_dailytarget_max}`
+        );
+        settings_form.querySelector(`#${key}`).value = up_wordcount_dailytarget;
+    } else if (value.value != up_wordcount_dailytarget) {
+        up_wordcount_dailytarget = value.value;
+        localStorage.setObject(key, value.value);
+        // reset the hasBeenNotified field
+        setHasBeenNotified(false);
     }
 }
 
 function set_wordcount_notificationhour(key, value) {
-    console.log(key, value);
+    if (value.value < up_wordcount_notificationhour_min || value.value > up_wordcount_notificationhour_max) {
+        alert(
+            `You set ${value.value}, but wordcount notification hour must be between ${up_wordcount_notificationhour_min} and ${up_wordcount_notificationhour_max}`
+        );
+        settings_form.querySelector(`#${key}`).value = up_wordcount_notificationhour;
+    }
     if (value.value != up_wordcount_notificationhour) {
+        up_wordcount_notificationhour = value.value;
+        localStorage.setObject(key, value.value);
+        // reset the hasBeenNotified field
+        setHasBeenNotified(false);
     }
 }
 
@@ -762,54 +803,56 @@ async function fetchAsync(url) {
 
 function semanticVersionCompare(a, b) {
     // from https://gist.github.com/iwill/a83038623ba4fef6abb9efca87ae9ccb
-    if (a.startsWith(b + "-")) return -1
-    if (b.startsWith(a + "-")) return  1
-    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "case", caseFirst: "upper" })
+    if (a.startsWith(b + "-")) return -1;
+    if (b.startsWith(a + "-")) return 1;
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: "case", caseFirst: "upper" });
 }
 
 async function checkForUpdate(reportAll = false) {
-    tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags")
-    if (!(tags.length) || tags.length === undefined) {
-        console.error("Can not retrieve latest version for update checking")
-        return
+    tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
+    if (!tags.length || tags.length === undefined) {
+        console.error("Can not retrieve latest version for update checking");
+        return;
     }
-    latest_version = tags[0].name.replace('v', '')
-    comparison = semanticVersionCompare(latest_version, appversion)
+    latest_version = tags[0].name.replace("v", "");
+    comparison = semanticVersionCompare(latest_version, appversion);
     if (comparison == 0 && comparison !== "") {
-        console.log("Update check completed, no update available.")
+        console.log("Update check completed, no update available.");
         if (reportAll == true) {
-            alert("You're up to date with the latest version!")
+            alert("You're up to date with the latest version!");
         }
     } else if (comparison == 1) {
         goToUpdate = confirm(`Update available! 
             Current: ${appversion}, latest: ${latest_version}.
-            Go to downloads page?`)
+            Go to downloads page?`);
         if (goToUpdate) {
-            window.open("https://github.com/fjwillemsen/NativeOverleaf/releases/tag/v1.2.0")
+            window.open("https://github.com/fjwillemsen/NativeOverleaf/releases/latest/");
         }
     } else if (comparison == -1) {
-        result = `No update needed, current version (${appversion}) is newer than latest publicly available version (${latest_version}).`
-        console.log(result)
+        result = `No update needed, current version (${appversion}) is newer than latest publicly available version (${latest_version}).`;
+        console.log(result);
         if (reportAll == true) {
-            alert(result)
+            alert(result);
         }
     } else {
-        result = `Invalid semantic version comparison outcome: ${comparison}`
-        console.log(result)
+        result = `Invalid semantic version comparison outcome: ${comparison}`;
+        console.log(result);
         if (reportAll == true) {
-            alert(result)
+            alert(result);
         }
     }
 }
 
 function setAutoUpdateChecking() {
     // check for updates straight away
-    checkForUpdate()
+    checkForUpdate();
     // check for updates every six hours
-    setInterval(checkForUpdate, 6*60*60*1000);
+    setInterval(checkForUpdate, 6 * 60 * 60 * 1000);
     // trigger the check update function when the version label is clicked
-    if (document.querySelector('#versionlabel')) {
-        document.querySelector('#versionlabel').onclick = function(){ checkForUpdate(true) }
+    if (document.querySelector("#versionlabel")) {
+        document.querySelector("#versionlabel").onclick = function () {
+            checkForUpdate(true);
+        };
     }
 }
 // Contents Inserted from wordcount.js
@@ -935,6 +978,13 @@ async function updateWordCount() {
     localStorage.setObject("wordcounts", wordcounts);
 }
 
+// set the hasBeenNotified field to the boolean value
+function setHasBeenNotified(value) {
+    const currentdate = getLocalDate();
+    let wordcounts = getWordCounts();
+    wordcounts[this.project_id][currentdate].hasbeennotified = value;
+}
+
 // setup the repeated execution of updateWordCount
 function setupWordCount() {
     if (up_wordcount_tracking == true) {
@@ -943,7 +993,7 @@ function setupWordCount() {
             return;
         }
         updateWordCount();
-        wordcount_timer_id = setInterval(updateWordCount, 10 * 1000); // up_wordcount_interval * 60 * 1000
+        wordcount_timer_id = setInterval(updateWordCount, up_wordcount_interval * 60 * 1000);
     }
 }
 
@@ -954,9 +1004,9 @@ function destructWordCount() {
     }
 }
 // Contents Inserted from backup.js
-backup_types = ["Source", "PDF"];
-up_backup = true;
-up_backup_type = 0;
+const backup_types = ["Source", "PDF"];
+let up_backup = true;
+let up_backup_type = 0;
 
 function getBackupLink(backup_type_index) {
     if (document.querySelector("#left-menu")) {

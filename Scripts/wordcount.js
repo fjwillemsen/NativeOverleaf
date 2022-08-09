@@ -120,6 +120,13 @@ async function updateWordCount() {
     localStorage.setObject("wordcounts", wordcounts);
 }
 
+// set the hasBeenNotified field to the boolean value
+function setHasBeenNotified(value) {
+    const currentdate = getLocalDate();
+    let wordcounts = getWordCounts();
+    wordcounts[this.project_id][currentdate].hasbeennotified = value;
+}
+
 // setup the repeated execution of updateWordCount
 function setupWordCount() {
     if (up_wordcount_tracking == true) {
@@ -128,7 +135,7 @@ function setupWordCount() {
             return;
         }
         updateWordCount();
-        wordcount_timer_id = setInterval(updateWordCount, 10 * 1000); // up_wordcount_interval * 60 * 1000
+        wordcount_timer_id = setInterval(updateWordCount, up_wordcount_interval * 60 * 1000);
     }
 }
 
