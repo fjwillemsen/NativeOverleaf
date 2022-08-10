@@ -62,6 +62,9 @@ function getWordCountChartConfig() {
 
     // get the labels and data
     const wordcounts_project = wordcounts[this.project_id];
+    if (wordcounts == undefined || wordcounts.size() <= 0) {
+        alert("Wordcounts have not been tracked, enable wordcount tracking and reload the project");
+    }
     for (const [date, wordcount] of Object.entries(wordcounts_project)) {
         labels.push(date);
         const count =
