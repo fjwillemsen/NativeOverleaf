@@ -56,6 +56,31 @@ function addCSS() {
             position: relative;
             top: 2px;
         }
+        dialog {
+            width: 80vw;
+            background: #EEEFEE;
+            color: black;
+            border-color: #E9E9E9;
+            margin: auto;
+            position: fixed;
+            box-shadow: 5px;
+        }
+        dialog::backdrop {
+            background: black;
+            opacity: 0.7;
+            backdrop-filter: blur(25px);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            dialog {
+                background: #282A35;
+                color: white;
+                border-color: #485263;
+            }
+            #wordcountchart {
+                filter: invert(1) hue-rotate(180deg);
+            }
+        }
     `;
     let styleSheet = document.createElement("style");
     styleSheet.innerText = css_text;

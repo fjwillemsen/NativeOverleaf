@@ -1,5 +1,6 @@
 // keep the ID of the interval timer so it can be removed later on
 let wordcount_timer_id;
+let wordcounts;
 
 // recursively check whether the PDF has been compiled with four attempts accross an increasing waittime
 async function waitUntilPDFCompiled() {
@@ -68,8 +69,8 @@ function resetWordCounts() {
 
 // update the wordcount
 async function updateWordCount() {
+    wordcounts = getWordCounts();
     const currentdate = getLocalDate();
-    let wordcounts = getWordCounts();
     const wordcount = await getWordCount();
     const hasbeennotified = wordcounts[this.project_id][currentdate].hasbeennotified;
     if (wordcount === undefined) {
@@ -99,33 +100,35 @@ async function updateWordCount() {
     if (hasbeennotified == false && up_wordcount_notificationhour > -1) {
         const currenttime = new Date();
         if (currenttime.getHours() == up_wordcount_notificationhour) {
-            if (currenttime.getMinutes() <= up_wordcount_interval) {
-                if (up_wordcount_dailytarget <= 0) {
-                    new Notification(`You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words today.`);
-                } else if (achieved_wordcount < up_wordcount_dailytarget) {
-                    new Notification("You failed to meet today's target", {
-                        body: `You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words.`,
-                    });
-                } else {
-                    new Notification("Congrats, you met today's target!", {
-                        body: `You wrote ${achieved_wordcount} words, ${
-                            achieved_wordcount - up_wordcount_dailytarget
-                        } above target!`,
-                    });
-                }
-                wordcounts[this.project_id][currentdate].hasbeennotified = true;
+            if (up_wordcount_dailytarget <= 0) {
+                new Notification(`You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words today.`);
+            } else if (achieved_wordcount < up_wordcount_dailytarget) {
+                new Notification("You failed to meet today's target", {
+                    body: `You wrote ${achieved_wordcount} out of ${up_wordcount_dailytarget} words.`,
+                });
+            } else {
+                new Notification("Congrats, you met today's target!", {
+                    body: `You wrote ${achieved_wordcount} words, ${
+                        achieved_wordcount - up_wordcount_dailytarget
+                    } above target!`,
+                });
             }
+            wordcounts[this.project_id][currentdate].hasbeennotified = true;
         }
     }
 
     // save the update object to the localstorage
     localStorage.setObject("wordcounts", wordcounts);
+
+    // update the chart
+    if (wordcountchart !== undefined) {
+        updateWordCountChartData();
+    }
 }
 
 // set the hasBeenNotified field to the boolean value
 function setHasBeenNotified(value) {
     const currentdate = getLocalDate();
-    let wordcounts = getWordCounts();
     wordcounts[this.project_id][currentdate].hasbeennotified = value;
 }
 

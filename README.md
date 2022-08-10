@@ -30,17 +30,18 @@ However, would it not be even better if it were to behave like a native app on y
 - [x] notifications of chats, comments and comment threads
 - [x] preferences pane integrated in the Overleaf sidemenu
 - [x] automatic update checking
-- [x] words-per-day tracker & reminder (useful for the 200-words-per-day-doctrine)
+- [x] words-per-day tracker, reminder & graph (useful for the 200-words-per-day-doctrine)
 
 <p float="left">
     <img src="Assets/showcase/notifications/badgecount.png" alt="notification badgecount">
     <img src="Assets/showcase/notifications/notificationcenter_light.png" width="250" alt="notification center showcase">
+    <img src="Assets/showcase/wordcount/wordcount_notification_hour.png" width="250" alt="notification center wordcount hour">
     <img src="Assets/showcase/preferences/preferences_pane_extended.png" width="200" alt="preferences pane">
+    <img src="Assets/showcase/wordcount/wordcount_overview_dark.png" alt="wordcount overview graph">
 </p>
 
 
 ## Next Features
-- [ ] words-per-day graph (planned for next version)
 - [ ] automated local backups of projects (planned for future version)
 - [ ] notifications for tracked changes (planned for future version)
 - [ ] integrate Writeful for Overleaf extension (future version if technically possible) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
@@ -50,6 +51,7 @@ However, would it not be even better if it were to behave like a native app on y
 ## Tips
 - The preferences pane can be found in the same left-side menu as the other Overleaf settings. 
 - You can run multiple instances of Native Overleaf, allowing you to keep multiple projects open at the same time and receive notifications for each project. 
+- The word count tracker tracks the total words in the project, so includes anything written by other authors. It counts the words in the compiled PDF, hence it must be recompiled to reflect recent changes. 
 - Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the background, so you will not get notifications while working in a project. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
 
 ## How it works

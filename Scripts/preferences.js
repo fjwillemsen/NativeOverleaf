@@ -54,8 +54,7 @@ function getFormSelectHTML(category_dicts, category_names) {
         }
         category_dict = category_dicts[category_index];
         for (let key in category_dict) {
-            val = category_dict[key];
-            str += `<option value="${key}">${val}</option>\n`;
+            str += `<option value="${key}">${category_dict[key]}</option>\n`;
         }
         str += endstr;
     }
@@ -64,7 +63,7 @@ function getFormSelectHTML(category_dicts, category_names) {
 
 // settings menu pane
 function setupPreferencesPane() {
-    settings_html = `
+    const settings_html = `
         <h4>Native Overleaf</h4>
         <div class="containter-fluid">
             <p style="margin: 0">Version ${appversion}</p> 
@@ -138,6 +137,9 @@ function setupPreferencesPane() {
                     <br/>
                     <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, -1 means no notification)</i></label>
                     <input type="number" id="wordcount_notificationhour" min="${up_wordcount_notificationhour_min}" max="${up_wordcount_notificationhour_max}">
+                    <br/>
+                    <br/>
+                    <div class="btn btn-primary" id="button_show_wordcount_graph">Show wordcount graph</div>
             </div>
         </form>`;
     if (document.querySelector("#left-menu")) {
@@ -176,6 +178,11 @@ function setupPreferencesPane() {
             for (let id_key in settings_handler) {
                 settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`));
             }
+        });
+
+        // listen for button clicks
+        document.getElementById("button_show_wordcount_graph").addEventListener("click", () => {
+            showWordCountChart();
         });
     }
 }

@@ -50,6 +50,5 @@ addCSS()
 setAutoUpdateChecking()
 setupWordCount()
 // setupBackup()
-setupCharts()
 const endTime = performance.now();
 console.log(`Native Overleaf injected setup took ${endTime - startTime} milliseconds`);
