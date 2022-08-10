@@ -37,7 +37,7 @@ However, would it not be even better if it were to behave like a native app on y
     <img src="Assets/showcase/notifications/notificationcenter_light.png" width="250" alt="notification center showcase">
     <img src="Assets/showcase/wordcount/wordcount_notification_hour.png" width="250" alt="notification center wordcount hour">
     <img src="Assets/showcase/preferences/preferences_pane_extended.png" width="200" alt="preferences pane">
-    <img src="Assets/showcase/wordcount/wordcount_overview_dark.png" alt="wordcount overview graph">
+    <img src="Assets/showcase/wordcount/wordcount_overview_dark.png" width="350" alt="wordcount overview graph">
 </p>
 
 
