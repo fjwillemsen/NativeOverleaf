@@ -29,13 +29,10 @@ let up_overalltheme_light = localStorage.getObject("overalltheme_light") || over
 let up_editortheme_dark = localStorage.getObject("editortheme_dark") || editorThemes_dark[0];
 let up_editortheme_light = localStorage.getObject("editortheme_light") || editorThemes_light[0];
 let up_wordcount_tracking = localStorage.getObject("wordcount_tracking") || true; // whether wordcount tracking is enabled
-let up_wordcount_interval = localStorage.getObject("wordcount_interval") || 15; // interval to check on the wordcount in minutes
 let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget") || 200; // net number of words that must be produced daily
 let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour") || 18; // hour of the day at which the user is notified whether they have achieved their goal
 
 // user preferences boundaries
-let up_wordcount_interval_min = 1;
-let up_wordcount_interval_max = 360;
 let up_wordcount_dailytarget_min = 1;
 let up_wordcount_dailytarget_max = 2147483647;
 let up_wordcount_notificationhour_min = -1;
@@ -129,20 +126,17 @@ function setupPreferencesPane() {
                         <span class="settings-toggle-label">Tracking</span>
                     </label>
                     <br/>
-                    <label for="wordcount_interval">Checking interval in minutes:</label>
-                    <input type="number" id="wordcount_interval" min="${up_wordcount_interval_min}" max="${up_wordcount_interval_max}">
+                        <label for="wordcount_dailytarget">Daily number of words target:<br/><i>(0 means no target)</i></label>
+                        <input type="number" id="wordcount_dailytarget" min="${up_wordcount_dailytarget_min}" max="${up_wordcount_dailytarget_max}">
                     <br/>
-                    <label for="wordcount_dailytarget">Daily number of words target:<br/><i>(0 means no target)</i></label>
-                    <input type="number" id="wordcount_dailytarget" min="${up_wordcount_dailytarget_min}" max="${up_wordcount_dailytarget_max}">
-                    <br/>
-                    <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, -1 means no notification)</i></label>
-                    <input type="number" id="wordcount_notificationhour" min="${up_wordcount_notificationhour_min}" max="${up_wordcount_notificationhour_max}">
+                        <label for="wordcount_notificationhour">Hour of daily notification:<br/><i>(0 to 23, -1 means no notification)</i></label>
+                        <input type="number" id="wordcount_notificationhour" min="${up_wordcount_notificationhour_min}" max="${up_wordcount_notificationhour_max}">
                     <br/>
                     <br/>
-                    <div class="btn btn-primary" id="button_show_wordcount_graph">Show wordcount graph</div>
+                        <div class="btn btn-primary" id="button_show_wordcount_graph">Show wordcount graph</div>
                     <br/>
                     <br/>
-                    <div class="btn btn-warning" id="button_reset_wordcount">Reset wordcount</div>
+                        <div class="btn btn-warning" id="button_reset_wordcount">Reset wordcount</div>
             </div>
         </form>`;
     if (document.querySelector("#left-menu")) {
@@ -163,7 +157,6 @@ function setupPreferencesPane() {
         settings_form.querySelector("#editortheme_dark").value = up_editortheme_dark;
         settings_form.querySelector("#editortheme_light").value = up_editortheme_light;
         settings_form.querySelector("#wordcount_tracking").checked = up_wordcount_tracking;
-        settings_form.querySelector("#wordcount_interval").value = up_wordcount_interval;
         settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
         settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
 
@@ -172,7 +165,6 @@ function setupPreferencesPane() {
         settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
-        settings_form.querySelector("#wordcount_interval").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
 
@@ -215,7 +207,6 @@ const settings_handler = {
     editortheme_dark: set_editortheme_dark,
     editortheme_light: set_editortheme_light,
     wordcount_tracking: set_wordcount_tracking,
-    wordcount_interval: set_wordcount_interval,
     wordcount_dailytarget: set_wordcount_dailytarget,
     wordcount_notificationhour: set_wordcount_notificationhour,
 };
@@ -224,7 +215,6 @@ function set_wordcount_tracking(key, value) {
     if (value.checked != up_wordcount_tracking) {
         up_wordcount_tracking = value.checked;
         localStorage.setObject(key, value.checked);
-        settings_form.querySelector("#wordcount_interval").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
         if (up_wordcount_tracking == true) {
@@ -234,21 +224,6 @@ function set_wordcount_tracking(key, value) {
             // remove the interval
             destructWordCount();
         }
-    }
-}
-
-function set_wordcount_interval(key, value) {
-    if (value.value < up_wordcount_interval_min || value.value > up_wordcount_interval_max) {
-        alert(
-            `You set ${value.value}, but wordcount interval must be between ${up_wordcount_interval_min} and ${up_wordcount_interval_max}`
-        );
-        settings_form.querySelector(`#${key}`).value = up_wordcount_interval;
-    } else if (value.value != up_wordcount_interval) {
-        up_wordcount_interval = value.value;
-        localStorage.setObject(key, value.value);
-        // register the wordcount tracking again so the new interval is used
-        destructWordCount();
-        setupWordCount();
     }
 }
 
