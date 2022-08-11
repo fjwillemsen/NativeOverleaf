@@ -140,6 +140,9 @@ function setupPreferencesPane() {
                     <br/>
                     <br/>
                     <div class="btn btn-primary" id="button_show_wordcount_graph">Show wordcount graph</div>
+                    <br/>
+                    <br/>
+                    <div class="btn btn-warning" id="button_reset_wordcount">Reset wordcount</div>
             </div>
         </form>`;
     if (document.querySelector("#left-menu")) {
@@ -183,6 +186,20 @@ function setupPreferencesPane() {
         // listen for button clicks
         document.getElementById("button_show_wordcount_graph").addEventListener("click", () => {
             showWordCountChart();
+        });
+        document.getElementById("button_reset_wordcount").addEventListener("click", () => {
+            let text_number_of_days = "";
+            if (wordcounts !== undefined && wordcounts[this.project_id] !== undefined) {
+                text_number_of_days = `You currently have ${
+                    Object.keys(wordcounts[this.project_id]).length
+                } tracked days.`;
+            }
+            const resetWordCount = confirm(`Are you sure you want to remove all tracked wordcount history?
+                    ${text_number_of_days}`);
+            if (resetWordCount) {
+                resetWordCounts();
+                setupWordCount();
+            }
         });
     }
 }

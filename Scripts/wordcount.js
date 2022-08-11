@@ -64,6 +64,7 @@ function getWordCounts() {
 
 // reset the wordcount history (in case you change your system's date / cross the international dateline)
 function resetWordCounts() {
+    wordcounts = undefined;
     return localStorage.removeItem("wordcounts");
 }
 
