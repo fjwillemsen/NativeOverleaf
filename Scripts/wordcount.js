@@ -1,5 +1,6 @@
 // keep the ID of the interval timer so it can be removed later on
 let wordcount_timer_id;
+let compilation_observer;
 let wordcounts;
 
 // recursively check whether the PDF has been compiled with four attempts accross an increasing waittime
@@ -134,20 +135,34 @@ function setHasBeenNotified(value) {
 }
 
 // setup the repeated execution of updateWordCount
-function setupWordCount() {
+async function setupWordCount() {
     if (up_wordcount_tracking == true) {
         if (this.project_id === undefined) {
             console.warn("Project ID is not defined, unable to keep word count");
             return;
         }
+
+        // set the initial word count on load
+        await waitUntilPDFCompiled();
         updateWordCount();
-        wordcount_timer_id = setInterval(updateWordCount, up_wordcount_interval * 60 * 1000);
+
+        // set the observer for when the PDF is recompiled
+        let pdf_element = getBackupElement(1);
+        if (compilation_observer === undefined) {
+            compilation_observer = new MutationObserver(function (mutations) {
+                console.log("PDF compiled, updating wordcount");
+                updateWordCount();
+            });
+        }
+        compilation_observer.observe(pdf_element, {
+            attributes: true,
+        });
     }
 }
 
 // stop the repeated execution of updateWordCount
 function destructWordCount() {
-    if (up_wordcount_tracking == false && wordcount_timer_id !== undefined) {
-        clearInterval(wordcount_timer_id);
+    if (up_wordcount_tracking == false && compilation_observer !== undefined) {
+        compilation_observer.disconnect();
     }
 }
