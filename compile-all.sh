@@ -1,7 +1,19 @@
 #!/bin/bash
 echo
 
+# run the unit tests
+echo "Running unit tests"
+npm run test
+if [ $? -eq 0 ] # check the exit status of the last command
+then
+  echo
+else
+  echo "Unit tests failed"
+  exit 1
+fi
+
 # bundle all scripts by replacing insert statements with file contents
+echo
 cd Scripts
 echo "Bundling scripts"
 /bin/bash bundle_scripts.sh
