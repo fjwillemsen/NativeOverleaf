@@ -30,7 +30,7 @@ function autoChangeColorMode(event) {
 function setupColormode() {
     if (colorscheme !== undefined && up_colormode_switching == true) {
         switchColorMode();
-        // if the colorscheme changes
+        // listen to when the colorscheme changes
         colorscheme.addEventListener("change", autoChangeColorMode, true);
     }
 }

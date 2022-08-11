@@ -25,7 +25,7 @@ let lastNotificationResetTimestamp = Date.now()
 const originalDocumentTitle = document.title
 let current_colorscheme_preference;
 if (window.matchMedia) {
-    let colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
+    colorscheme = window.matchMedia('(prefers-color-scheme: dark)')
     current_colorscheme_preference = colorscheme.matches ? "dark" : "light";
 }
 
