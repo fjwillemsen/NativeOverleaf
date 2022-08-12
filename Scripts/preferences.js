@@ -120,6 +120,7 @@ function setupPreferencesPane() {
                         </select>
                 <hr/>
                 <h6>Wordcount Tracking</h6>
+                    <p>When the document is recompiled, this keeps track of the number of words, allowing you to see your progress.</p>
                     <label class="settings-toggle">
                         <input id="wordcount_tracking" class="settings-toggle-checkbox" type="checkbox">
                         <div class="settings-toggle-switch"></div>

@@ -31,8 +31,10 @@ async function getWordCount() {
     if (wordcount_el && wordcount_el !== undefined && wordcount_el.scope !== undefined) {
         let wordcount_scope = wordcount_el.scope();
 
-        if (wordcount_scope !== undefined && (await waitUntilPDFCompiled()) == true) {
+        if (wordcount_scope !== undefined && (await waitUntilPDFCompiled()) != false) {
+            console.log("gwc 1");
             wordcount_scope.openWordCountModal();
+            console.log("gwc 2");
 
             // check if the wordcount is loaded in quick successions, 100 attempts with a timeout of 50ms
             const wordcount = await recursiveCheckAndWait(extractWordCount, 50, 100);
@@ -44,6 +46,7 @@ async function getWordCount() {
             return wordcount;
         }
     }
+    return;
 }
 
 // retrieve the wordcounts from local storage and add the keys where necessary
@@ -87,7 +90,6 @@ async function updateWordCount() {
     // update the latest wordcount
     wordcounts[this.project_id][currentdate].latest = wordcount;
     const achieved_wordcount = wordcount - wordcounts[this.project_id][currentdate].earliest;
-
     // notify the user if the target number of words are reached
     if (hasbeennotified == false && up_wordcount_dailytarget > 0 && achieved_wordcount >= up_wordcount_dailytarget) {
         new Notification("Awesome, already met today's target!", {
@@ -142,21 +144,22 @@ async function setupWordCount() {
             return;
         }
 
-        // set the initial word count on load
-        await waitUntilPDFCompiled();
-        updateWordCount();
+        if ((await waitUntilPDFCompiled()) != false) {
+            // set the initial word count on load
+            updateWordCount();
 
-        // set the observer for when the PDF is recompiled
-        let pdf_element = getBackupElement(1);
-        if (compilation_observer === undefined) {
-            compilation_observer = new MutationObserver(function (mutations) {
-                console.log("PDF compiled, updating wordcount");
-                updateWordCount();
+            // set the observer for when the PDF is recompiled
+            let pdf_element = getBackupElement(1);
+            if (compilation_observer === undefined) {
+                compilation_observer = new MutationObserver(function (mutations) {
+                    console.log("PDF compiled, updating wordcount");
+                    updateWordCount();
+                });
+            }
+            compilation_observer.observe(pdf_element, {
+                attributes: true,
             });
         }
-        compilation_observer.observe(pdf_element, {
-            attributes: true,
-        });
     }
 }
 
