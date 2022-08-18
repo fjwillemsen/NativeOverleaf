@@ -12,11 +12,11 @@ However, would it not be even better if it were to behave like a native app on y
 - [Features](#features)
 - [Next Features](#next-features)
 - [Tips](#tips)
-- [How it works](#how-it-works)
 - [Download binary](#download-binary)
   - [**Mac**](#mac)
   - [**Linux**](#linux)
   - [**Windows**](#windows)
+- [How it works](#how-it-works)
 - [Troubleshooting](#troubleshooting)
   - [Institutional login](#institutional-login)
   - [Unable to open on Mac](#unable-to-open-on-mac)
@@ -56,9 +56,6 @@ However, would it not be even better if it were to behave like a native app on y
 - The word count tracker uses the local date of your system, hence inconsistencies may arise when switching time zones. If necessary, the word count can be reset using the button in the preferences pane. 
 - Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the app. Multiple instances of the app can be openened at the same time. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
 
-## How it works
-Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native feature with a large number of supported platforms. <!-- may switch to [Multi](https://github.com/kofigumbs/multi#purchasing) in the future -->
-
 ## Download binary
 If there is interest in this project, I will add it to Homebrew for easy updates. 
 Should you have any problems running the app, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
@@ -78,6 +75,9 @@ For now, the following binaries have been precompiled and can be downloaded dire
 * [X86 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-x64.zip)
 
 If your platform / architecture is missing, let me know via the [discussions page](https://github.com/fjwillemsen/NativeOverleaf/discussions), or compile it yourself using the instructions below. 
+
+## How it works
+Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native features for a large number of supported platforms. <!-- may switch to [Multi](https://github.com/kofigumbs/multi) in the future -->
 
 ## Troubleshooting
 If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
