@@ -1,4 +1,8 @@
 #!/bin/bash
+OUTPUT_RED='\033[0;31m'    # red
+OUTPUT_ORANGE='\033[0;33m'    # orange
+OUTPUT_GREEN='\033[0;32m'   # green
+OUTPUT_NC='\033[0m' # no color
 echo
 
 # run the unit tests
@@ -6,9 +10,9 @@ echo "Running unit tests"
 npm run test
 if [ $? -eq 0 ] # check the exit status of the last command
 then
-  echo
+  echo -e "|${OUTPUT_GREEN} unit tests passed ${OUTPUT_NC}"
 else
-  echo "Unit tests failed"
+  echo -e "|${OUTPUT_RED} unit tests failed"
   exit 1
 fi
 
@@ -24,9 +28,9 @@ echo "Statically validating bundled script"
 validated=$(node --check bundled_script.js 2>&1)
 if [ -z "$validated" ]
 then
-    echo "| valid"
+    echo -e "|${OUTPUT_GREEN} valid ${OUTPUT_NC}"
 else
-    echo "| invalid bundled_script.js, reason:"
+    echo -e "|${OUTPUT_RED} invalid bundled_script.js, reason:"
     echo $validated
     exit 1
 fi
@@ -35,6 +39,10 @@ fi
 echo "Minifying bundled script"
 terser bundled_script.js --compress --output bundled_script.js  # use --timings to see how long each step takes
 echo
+
+# Clean the binaries folder 
+rm -rf Binaries
+mkdir Binaries
 
 # Setup variables
 echo
@@ -58,10 +66,26 @@ function compile() {
     # read in remaining arguments as options string
     shift 3
     _options="${@:-""}"
-    echo "Compiling with '$_platform $_arch $_icon $_options'"
-    $basecommand $_platform $_arch $_icon $_options 2>&1 | grep -v "Hi! Nativefier is minimally maintained" | grep -v "If you have the time" | grep -v "Please go to" | grep -v "Processing options..." | grep -v "Preparing Electron app..." | grep -v "Converting icons..." | grep -v "Packaging...* cached yet..." | grep -v "Finalizing build..." | grep -v "App built to " | grep -v "Menu/desktop shortcuts are" | grep -v '^$'
-    echo
+    echo "compiling with '$_platform $_arch $_icon $_options'"
+    # execute compilation while redirecting stdout and stderr to respective files
+    $basecommand $_platform $_arch $_icon $_options > out 2>error
+    if grep -iq ERROR error; # check if the error output contains "Error"
+    then
+        echo -e "|${OUTPUT_RED} failed to compile, reason: (check error file for details) ${OUTPUT_NC}"
+        cat error | grep -i ERROR
+        exit 1
+    fi
+    if grep -iq WARNING error; # check if the error output contains "Warning"
+    then
+        echo -e "|${OUTPUT_ORANGE} compiled with warnings, reason: (check error file for details) ${OUTPUT_NC}"
+        cat error | grep -i WARNING
+        exit 1
+    fi
+    # clean up the outputted files and argument list
+    rm error
+    rm out
     shift $#
+    echo
 }
 
 # Mac
