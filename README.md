@@ -28,6 +28,7 @@ However, would it not be even better if it were to behave like a native app on y
 - [x] standalone native application
 - [x] system-based dark / light mode switching 
 - [x] notifications of chats, comments and comment threads
+- [x] notifications of tracked changes
 - [x] preferences pane integrated in the Overleaf sidemenu
 - [x] automatic update checking
 - [x] words-per-day tracker, reminder & graph (useful for the 200-words-per-day-doctrine)
@@ -43,7 +44,7 @@ However, would it not be even better if it were to behave like a native app on y
 
 ## Next Features
 - [ ] automated local backups of projects (planned for future version)
-- [ ] notifications for tracked changes (planned for future version)
+- [ ] date range selection for wordcount graph (planned for future version)
 - [ ] integrate Writeful for Overleaf extension (future version if technically possible) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
 
 [Looking to contribute?](#ideas-questions-contributions)
@@ -53,7 +54,7 @@ However, would it not be even better if it were to behave like a native app on y
 - You can run multiple instances of Native Overleaf, allowing you to keep multiple projects open at the same time and receive notifications for each project. 
 - The word count tracker tracks the total words in the project, so includes anything written by other authors. It counts the words in the compiled PDF, hence it must be recompiled to track a new change in the number of words. 
 - The word count tracker uses the local date of your system, hence inconsistencies may arise when switching time zones. If necessary, the word count can be reset using the button in the preferences pane. 
-- Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the background, so you will not get notifications while working in a project. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
+- Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the app. Multiple instances of the app can be openened at the same time. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
 
 ## How it works
 Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native feature with a large number of supported platforms. <!-- may switch to [Multi](https://github.com/kofigumbs/multi#purchasing) in the future -->

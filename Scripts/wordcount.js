@@ -32,9 +32,7 @@ async function getWordCount() {
         let wordcount_scope = wordcount_el.scope();
 
         if (wordcount_scope !== undefined && (await waitUntilPDFCompiled()) != false) {
-            console.log("gwc 1");
             wordcount_scope.openWordCountModal();
-            console.log("gwc 2");
 
             // check if the wordcount is loaded in quick successions, 100 attempts with a timeout of 50ms
             const wordcount = await recursiveCheckAndWait(extractWordCount, 50, 100);

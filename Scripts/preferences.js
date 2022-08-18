@@ -19,10 +19,13 @@ const editorThemes_light = {
 };
 
 // user preferences (abbreviated UP)
-let up_notifications = localStorage.getObject("notifications") || true;
 let up_notifications_comments = localStorage.getObject("notifications_comment") || true;
-let up_notifications_comment_threads = localStorage.getObject("up_notifications_comment_response") || true;
+let up_notifications_comment_threads = localStorage.getObject("notifications_comment_response") || true;
 let up_notifications_chats = localStorage.getObject("notifications_chat") || true;
+let up_notifications_tracked_changes_created = localStorage.getObject("notifications_tracked_changes_created") || true;
+let up_notifications_tracked_changes_updated = localStorage.getObject("notifications_tracked_changes_updated") || true;
+let up_notifications_tracked_changes_resolved =
+    localStorage.getObject("notifications_tracked_changes_resolved") || true;
 let up_colormode_switching = localStorage.getObject("colormode_switching") || true;
 let up_overalltheme_dark = localStorage.getObject("overalltheme_dark") || overallThemes_dark[0];
 let up_overalltheme_light = localStorage.getObject("overalltheme_light") || overallThemes_light[0];
@@ -84,6 +87,28 @@ function setupPreferencesPane() {
                         <input id="notifications_comment_response" class="settings-toggle-checkbox" type="checkbox">
                         <div class="settings-toggle-switch"></div>
                         <span class="settings-toggle-label">Comment threads</span>
+                    </label>
+                    <br/>
+                    <br/>
+                    <b>Suggested Changes</b><br/>
+                    <i>Get notifications on tracked changes</i>
+                    <br/>
+                    <label class="settings-toggle">
+                        <input id="notifications_tracked_changes_created" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Added suggestions</span>
+                    </label>
+                    <br/>
+                    <label class="settings-toggle">
+                        <input id="notifications_tracked_changes_updated" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Updated suggestions</span>
+                    </label>
+                    <br/>
+                    <label class="settings-toggle">
+                        <input id="notifications_tracked_changes_resolved" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Resolved suggestions</span>
                     </label>
                 <hr/>
                 <h6>Dark / Light Mode</h6>
@@ -152,6 +177,12 @@ function setupPreferencesPane() {
         settings_form.querySelector("#notifications_chat").checked = up_notifications_chats;
         settings_form.querySelector("#notifications_comment").checked = up_notifications_comments;
         settings_form.querySelector("#notifications_comment_response").checked = up_notifications_comment_threads;
+        settings_form.querySelector("#notifications_tracked_changes_created").checked =
+            up_notifications_tracked_changes_created;
+        settings_form.querySelector("#notifications_tracked_changes_updated").checked =
+            up_notifications_tracked_changes_updated;
+        settings_form.querySelector("#notifications_tracked_changes_resolved").checked =
+            up_notifications_tracked_changes_resolved;
         settings_form.querySelector("#colormode_switching").checked = up_colormode_switching;
         settings_form.querySelector("#overalltheme_dark").value = up_overalltheme_dark;
         settings_form.querySelector("#overalltheme_light").value = up_overalltheme_light;
@@ -202,6 +233,9 @@ const settings_handler = {
     notifications_chat: set_notifications_chat,
     notifications_comment: set_notifications_comment,
     notifications_comment_response: set_notifications_comment_response,
+    notifications_tracked_changes_created: set_notifications_tracked_changes_created,
+    notifications_tracked_changes_updated: set_notifications_tracked_changes_updated,
+    notifications_tracked_changes_resolved: set_notifications_tracked_changes_resolved,
     colormode_switching: set_colormode_switching,
     overalltheme_dark: set_overalltheme_dark,
     overalltheme_light: set_overalltheme_light,
@@ -211,6 +245,55 @@ const settings_handler = {
     wordcount_dailytarget: set_wordcount_dailytarget,
     wordcount_notificationhour: set_wordcount_notificationhour,
 };
+
+function set_notifications_tracked_changes_created(key, value) {
+    if (value.checked != up_notifications_tracked_changes_created) {
+        up_notifications_tracked_changes_created = value.checked;
+        localStorage.setObject(key, value.checked);
+        if (up_notifications_tracked_changes_created == true && notificationsRequiresSetup() == true) {
+            // register the notifications again
+            setupNotifications();
+        } else if (notificationsRequiresDestruction() == true) {
+            destructWordCount();
+        }
+    }
+}
+
+function set_notifications_tracked_changes_updated(key, value) {
+    if (value.checked != up_notifications_tracked_changes_updated) {
+        up_notifications_tracked_changes_updated = value.checked;
+        localStorage.setObject(key, value.checked);
+        if (up_notifications_tracked_changes_updated == true && notificationsRequiresSetup() == true) {
+            // register the notifications again
+            setupNotifications();
+        } else if (notificationsRequiresDestruction() == true) {
+            destructWordCount();
+        }
+    }
+}
+
+function set_notifications_tracked_changes_resolved(key, value) {
+    if (value.checked != up_notifications_tracked_changes_resolved) {
+        up_notifications_tracked_changes_resolved = value.checked;
+        localStorage.setObject(key, value.checked);
+        if (up_notifications_tracked_changes_resolved == true && notificationsRequiresSetup() == true) {
+            // register the notifications again
+            setupNotifications();
+        } else if (notificationsRequiresDestruction() == true) {
+            destructWordCount();
+        }
+    }
+}
+
+//
+//
+// SETTERS
+//
+//
+
+//
+// Wordcounts
+//
 
 function set_wordcount_tracking(key, value) {
     if (value.checked != up_wordcount_tracking) {
@@ -257,6 +340,10 @@ function set_wordcount_notificationhour(key, value) {
     }
 }
 
+//
+// Notifications
+//
+
 function set_notifications_chat(key, value) {
     if (value != up_notifications_chats) {
         up_notifications_chats = value.checked;
@@ -286,6 +373,10 @@ function set_notifications_comment_response(key, value) {
         setupNotifications();
     }
 }
+
+//
+// Themes
+//
 
 function set_colormode_switching(key, value) {
     if (value.checked != up_colormode_switching) {

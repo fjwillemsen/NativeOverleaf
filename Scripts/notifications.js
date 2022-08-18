@@ -5,12 +5,33 @@ function sendNotification(text) {
     updateCounter(1);
 }
 
+// function to remove special characters and truncate for notification text
+function cleanAndTruncateText(text, max_characters = 15) {
+    // remove linebreaks
+    text = text.replace(/(\r\n|\n|\r)/gm, "");
+    // truncate
+    if (text.length > max_characters) {
+        text = text.substring(0, max_characters) + "...";
+    }
+    return text;
+}
+
+// function returning whether the time since last notification is greater than the number of seconds
+function notificationsCooledDown(seconds = 5, timestamp = lastNotificationResetTimestamp) {
+    return Date.now() - timestamp > seconds * 1000;
+}
+
 // setup notifications
-function setupNotifications() {
+async function setupNotifications() {
     // first check if notifications are used at all before setting up
     const any_notifications_used =
-        up_notifications_chats == true || up_notifications_comments == true || up_notifications_comment_threads == true;
-    if (up_notifications == true && any_notifications_used == true) {
+        up_notifications_chats == true ||
+        up_notifications_comments == true ||
+        up_notifications_comment_threads == true ||
+        up_notifications_tracked_changes_created == true ||
+        up_notifications_tracked_changes_updated == true ||
+        up_notifications_tracked_changes_resolved == true;
+    if (any_notifications_used == true) {
         // check if browser supports notifications
         if (!("Notification" in window)) {
             alert("This browser does not support notifications");
@@ -32,18 +53,132 @@ function setupNotifications() {
             });
         }
 
-        // reset notifications if the window is in focus
+        // reset notifications if the document/window focus becomes true
         addEventListener("focus", resetCounter);
+
+        // set watch on tracked changes
+        if (
+            up_notifications_tracked_changes_created == true ||
+            up_notifications_tracked_changes_updated == true ||
+            up_notifications_tracked_changes_resolved == true
+        ) {
+            let changes_scope = angular.element("[ng-controller=ReviewPanelController]").scope();
+            // if the ReviewPanelController is in scope, set a watcher
+            if (changes_scope && changes_scope !== undefined) {
+                if (changes_watcher_unbind !== undefined) {
+                    throw "changes_watcher_unbind should be undefined at this point";
+                }
+                // if there are new changes, find the new ones and emit a notification for it
+                changes_watcher_unbind = changes_scope.$watch(
+                    `reviewPanel.entries`,
+                    function (newVal, oldVal) {
+                        // extract the actual object using the key
+                        oldVal = oldVal[Object.keys(oldVal)[0]];
+                        newVal = newVal[Object.keys(newVal)[0]];
+                        // get the differences between the old and the new object
+                        const diffs = deepDiffMapper.map(oldVal, newVal);
+                        const users = angular.element("[ng-controller=ReviewPanelController]").scope()
+                            .reviewPanel.formattedProjectMembers;
+                        for (const diff_key in diffs) {
+                            // unpack payload
+                            let payload = diffs[diff_key];
+                            if (payload == undefined) {
+                                continue;
+                            }
+
+                            // unwrap the payload if necessary
+                            if (payload.content && payload.content !== undefined) {
+                                payload = payload.content;
+                            }
+
+                            // if created, updated or resolved
+                            if (payload.type && payload.type !== undefined) {
+                                if (payload.type == "created") {
+                                    let message = payload.updated;
+                                    message.content = cleanAndTruncateText(message.content);
+                                    const user = users[message.metadata.user_id];
+                                    if (
+                                        up_notifications_tracked_changes_created == true &&
+                                        user.isSelf != true &&
+                                        new Date(message.metadata.ts) > new Date(lastNotificationResetTimestamp) &&
+                                        notificationsCooledDown(1, lastChangeNotificationTimestamp) // notificationsCooledDown is checked for 1 second because sometimes an update becomes a create, we want to avoid sending notifications for those
+                                    ) {
+                                        if (message.type == "aggregate-change") {
+                                            sendNotification(
+                                                `${user.name} suggests changing "${cleanAndTruncateText(
+                                                    message.metadata.replaced_content
+                                                )}" to "${message.content}"`
+                                            );
+                                        } else if (message.type == "insert") {
+                                            sendNotification(`${user.name} suggests adding "${message.content}"`);
+                                        } else if (message.type == "delete") {
+                                            sendNotification(`${user.name} suggests removing "${message.content}"`);
+                                        }
+                                        lastChangeNotificationTimestamp = Date.now();
+                                    }
+                                } else if (payload.type == "updated") {
+                                    // we can not check which user did this, so if the window has focus, we assume the user did it and don't notify
+                                    if (
+                                        up_notifications_tracked_changes_updated == true &&
+                                        payload.original !== undefined &&
+                                        typeof payload.original == "string" &&
+                                        payload.updated !== undefined &&
+                                        typeof payload.updated == "string" &&
+                                        document.hasFocus() == false
+                                    ) {
+                                        // check if it was more than 60 seconds ago that the last tracked change notification was sent
+                                        if (notificationsCooledDown(60, lastChangeNotificationTimestamp)) {
+                                            sendNotification(
+                                                `Suggested change "${cleanAndTruncateText(
+                                                    payload.original
+                                                )}" was updated to "${cleanAndTruncateText(payload.updated)}"`
+                                            );
+                                        }
+                                        lastChangeNotificationTimestamp = Date.now();
+                                    }
+                                } else if (payload.type == "deleted") {
+                                    // we can not check which user did this, so if the window has focus, we assume the user did it and don't notify
+                                    if (
+                                        up_notifications_tracked_changes_resolved == true &&
+                                        payload.original !== undefined &&
+                                        notificationsCooledDown(1) &&
+                                        document.hasFocus() == false
+                                    ) {
+                                        let message = payload.original;
+                                        message.content = cleanAndTruncateText(message.content);
+                                        if (payload.original.type == "aggregate-change") {
+                                            sendNotification(
+                                                `Resolved suggestion to change "${cleanAndTruncateText(
+                                                    message.metadata.replaced_content
+                                                )}" to "${message.content}"`
+                                            );
+                                        } else if (message.type == "insert") {
+                                            sendNotification(`Resolved suggestion to add "${message.content}"`);
+                                        } else if (message.type == "delete") {
+                                            sendNotification(`Resolved suggestion to delete "${message.content}"`);
+                                        }
+                                        lastChangeNotificationTimestamp = Date.now();
+                                    }
+                                } else {
+                                    console.warn("Unrecognized payload type", payload);
+                                }
+                            }
+                        }
+                    },
+                    true
+                );
+            }
+        }
 
         // set watch on comment threads
         if (up_notifications_comments == true) {
             let comments_scope = angular.element("[ng-controller=ReviewPanelController]").scope();
             // if the ReviewPanelController is in scope, set a watcher
-            if (comments_scope) {
-                // if there are new comments, find the new ones and emit a notification for it
+            if (comments_scope && comments_scope !== undefined) {
                 if (comments_watcher_unbind !== undefined) {
                     throw "comments_watcher_unbind should be undefined at this point";
                 }
+                // if there are new comments, find the new ones and emit a notification for it
                 comments_watcher_unbind = comments_scope.$watch(
                     "reviewPanel.commentThreads",
                     function (newVal, oldVal) {
@@ -108,7 +243,7 @@ function setupNotifications() {
                             mutations = mutations[mutations.length - 1];
                         }
                         // only continue if the mutation was at least two seconds after last reset to avoid sending historical chats
-                        if (Date.now() > lastNotificationResetTimestamp + 2 * 1000) {
+                        if (notificationsCooledDown(2)) {
                             for (const message_index in mutations.addedNodes) {
                                 message = mutations.addedNodes[message_index];
                                 if (message.getElementsByClassName) {
@@ -140,12 +275,39 @@ function setupNotifications() {
 }
 
 function destructNotifications() {
+    // do not check for requiresDestruction here because some preferences use this function to reset the notifications
     if (comments_watcher_unbind !== undefined) {
         comments_watcher_unbind();
         comments_watcher_unbind = undefined;
+    }
+    if (changes_watcher_unbind !== undefined) {
+        changes_watcher_unbind();
+        changes_watcher_unbind = undefined;
     }
     if (chat_observer !== undefined) {
         chat_observer.disconnect();
     }
     removeEventListener("focus", resetCounter);
+}
+
+// function that counts the number of enabled notification preferences
+function countEnabledNotificationPreferences() {
+    return (
+        !!up_notifications_chats +
+        !!up_notifications_comments +
+        !!up_notifications_comment_threads +
+        !!up_notifications_tracked_changes_created +
+        !!up_notifications_tracked_changes_updated +
+        !!up_notifications_tracked_changes_resolved
+    );
+}
+
+// function returning whether the notifications need to be setup again AFTER a UP has been set to true that was false before
+function notificationsRequiresSetup() {
+    return countEnabledNotificationPreferences() == 1;
+}
+
+// function returning whether the notifications can and should be deconstructed
+function notificationsRequiresDestruction() {
+    return countEnabledNotificationPreferences() == 0;
 }

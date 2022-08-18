@@ -2,6 +2,7 @@
 
 // register links to watchers for removal / reactivation
 let comments_watcher_unbind;
+let changes_watcher_unbind;
 let chat_observer;
 let colorscheme;
 
@@ -22,6 +23,7 @@ catch(e) {
 // global variables
 let notificationCounter = 0
 let lastNotificationResetTimestamp = Date.now()
+let lastChangeNotificationTimestamp = Date.now()
 const originalDocumentTitle = document.title
 let current_colorscheme_preference;
 if (window.matchMedia) {
