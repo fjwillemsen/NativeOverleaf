@@ -60,19 +60,7 @@ function getWordCountChartConfig() {
     // preferences
     const label = wordcountchart_show_net_wordcount == true ? "Net number of words written" : "Total number of words";
 
-    // get the labels and data
-    const wordcounts_project = wordcounts[this.project_id];
-    if (wordcounts == undefined || Object.keys(wordcounts).length <= 0) {
-        alert("Wordcounts have not been tracked, enable wordcount tracking and reload the project");
-    }
-    for (const [date, wordcount] of Object.entries(wordcounts_project)) {
-        labels.push(date);
-        const count =
-            wordcountchart_show_net_wordcount == true ? wordcount.latest - wordcount.earliest : wordcount.latest;
-        counts.push(count);
-    }
-
-    // put it in config format
+    // default config format
     let config = {
         type: "bar",
         data: {
@@ -81,6 +69,21 @@ function getWordCountChartConfig() {
         },
         options: {},
     };
+
+    // get the labels and data
+    if (wordcounts == undefined || Object.keys(wordcounts).length <= 0) {
+        alert(
+            "Wordcounts have not been tracked or have not properly loaded, check that wordcount tracking is enabled and recompile the PDF"
+        );
+        return config;
+    }
+    const wordcounts_project = wordcounts[this.project_id];
+    for (const [date, wordcount] of Object.entries(wordcounts_project)) {
+        labels.push(date);
+        const count =
+            wordcountchart_show_net_wordcount == true ? wordcount.latest - wordcount.earliest : wordcount.latest;
+        counts.push(count);
+    }
 
     // add the daily target if applicable
     if (wordcountchart_show_net_wordcount == true && up_wordcount_dailytarget > 0) {
