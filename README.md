@@ -55,6 +55,7 @@ However, would it not be even better if it were to behave like a native app on y
 - The word count tracker tracks the total words in the project, so includes anything written by other authors. It counts the words in the compiled PDF, hence it must be recompiled to track a new change in the number of words. 
 - The word count tracker uses the local date of your system, hence inconsistencies may arise when switching time zones. If necessary, the word count can be reset using the button in the preferences pane. 
 - Notice on notifications: For notifications to work, the app must be allowed to by your system. You will only receive notifications for projects that are opened in the app. Multiple instances of the app can be openened at the same time. **Important**: to get notifications for chats, the chat window must have been opened at least once after loading a project (you can close it again). This is a limitation of the way we listen for new chat messages. If someone has a better idea, please get in touch. 
+- PDF dark mode works by inversing the colors and reversing the hue, meaning the white-grey-black scale is inversed while the colors remain largely the same. This can make graphics appear slightly different. PDF dark mode has been implemented by adjusting the PDF web viewer, not the source or the PDF itself, so downloaded files are untouched. 
 
 ## Download binary
 If there is interest in this project, I will add it to Homebrew for easy updates. 
