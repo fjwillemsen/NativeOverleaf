@@ -25,7 +25,6 @@ function updateCounter(countToAdd) {
 }
 
 function resetCounter(event) {
-    console.log("Reset notification counter");
     notificationCounter = 0;
     document.title = originalDocumentTitle;
     lastNotificationResetTimestamp = Date.now();

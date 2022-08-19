@@ -7,6 +7,9 @@ function sendNotification(text) {
 
 // function to remove special characters and truncate for notification text
 function cleanAndTruncateText(text, max_characters = 15) {
+    if (text === undefined || text.length <= 0) {
+        return text;
+    }
     // remove linebreaks
     text = text.replace(/(\r\n|\n|\r)/gm, "");
     // truncate
