@@ -124,7 +124,7 @@ function setupPreferencesPane() {
                         <span class="settings-toggle-label">Include PDF</span>
                     </label>
                     <br/>
-                    <i>This option forces the PDF viewer to inverted colors, images may not be correctly displayed. This does not change the PDF file itself.</i>
+                    <i>This option forces the PDF viewer to inverted colors. This does not change the PDF file itself.</i>
                     <br/>
                     <br/>
                     <b>Dark Mode</b>
