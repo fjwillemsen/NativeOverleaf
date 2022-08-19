@@ -82,10 +82,7 @@ async function updateWordCount() {
 
     // if the earliest wordcount is not defined, use the previous latest wordcount
     if (wordcounts[this.project_id][currentdate].earliest === undefined) {
-        const dates = Object.keys(wordcounts[this.project_id]);
-        const last_date = dates[dates.length - 2]; // -1 is today, -2 the day before it
-        wordcounts[this.project_id][currentdate].earliest =
-            last_date.latest !== undefined ? last_date.latest : wordcount;
+        wordcounts[this.project_id][currentdate].earliest = wordcount;
     }
     // update the latest wordcount
     wordcounts[this.project_id][currentdate].latest = wordcount;
