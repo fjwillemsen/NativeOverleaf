@@ -98,26 +98,32 @@ async function setupNotifications() {
                             if (payload.type && payload.type !== undefined) {
                                 if (payload.type == "created") {
                                     let message = payload.updated;
-                                    message.content = cleanAndTruncateText(message.content);
-                                    const user = users[message.metadata.user_id];
                                     if (
-                                        up_notifications_tracked_changes_created == true &&
-                                        user.isSelf != true &&
-                                        new Date(message.metadata.ts) > new Date(lastNotificationResetTimestamp) &&
-                                        notificationsCooledDown(1, lastChangeNotificationTimestamp) // notificationsCooledDown is checked for 1 second because sometimes an update becomes a create, we want to avoid sending notifications for those
+                                        message !== undefined &&
+                                        message.content !== undefined &&
+                                        message.metadata !== undefined
                                     ) {
-                                        if (message.type == "aggregate-change") {
-                                            sendNotification(
-                                                `${user.name} suggests changing "${cleanAndTruncateText(
-                                                    message.metadata.replaced_content
-                                                )}" to "${message.content}"`
-                                            );
-                                        } else if (message.type == "insert") {
-                                            sendNotification(`${user.name} suggests adding "${message.content}"`);
-                                        } else if (message.type == "delete") {
-                                            sendNotification(`${user.name} suggests removing "${message.content}"`);
+                                        message.content = cleanAndTruncateText(message.content);
+                                        const user = users[message.metadata.user_id];
+                                        if (
+                                            up_notifications_tracked_changes_created == true &&
+                                            user.isSelf != true &&
+                                            new Date(message.metadata.ts) > new Date(lastNotificationResetTimestamp) &&
+                                            notificationsCooledDown(1, lastChangeNotificationTimestamp) // notificationsCooledDown is checked for 1 second because sometimes an update becomes a create, we want to avoid sending notifications for those
+                                        ) {
+                                            if (message.type == "aggregate-change") {
+                                                sendNotification(
+                                                    `${user.name} suggests changing "${cleanAndTruncateText(
+                                                        message.metadata.replaced_content
+                                                    )}" to "${message.content}"`
+                                                );
+                                            } else if (message.type == "insert") {
+                                                sendNotification(`${user.name} suggests adding "${message.content}"`);
+                                            } else if (message.type == "delete") {
+                                                sendNotification(`${user.name} suggests removing "${message.content}"`);
+                                            }
+                                            lastChangeNotificationTimestamp = Date.now();
                                         }
-                                        lastChangeNotificationTimestamp = Date.now();
                                     }
                                 } else if (payload.type == "updated") {
                                     // we can not check which user did this, so if the window has focus, we assume the user did it and don't notify
