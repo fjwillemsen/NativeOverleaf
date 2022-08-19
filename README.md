@@ -11,7 +11,7 @@ However, would it not be even better if it were to behave like a native app on y
 - [Contents](#contents)
 - [Features](#features)
 - [Next Features](#next-features)
-- [Tips](#tips)
+- [Hints](#hints)
 - [Download binary](#download-binary)
   - [**Mac**](#mac)
   - [**Linux**](#linux)
@@ -49,7 +49,7 @@ However, would it not be even better if it were to behave like a native app on y
 
 [Looking to contribute?](#ideas-questions-contributions)
 
-## Tips
+## Hints
 - The preferences pane can be found in the same left-side menu as the other Overleaf settings. 
 - You can run multiple instances of Native Overleaf, allowing you to keep multiple projects open at the same time and receive notifications for each project. 
 - The word count tracker tracks the total words in the project, so includes anything written by other authors. It counts the words in the compiled PDF, hence it must be recompiled to track a new change in the number of words. 
