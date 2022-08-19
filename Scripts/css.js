@@ -80,6 +80,14 @@ function addCSS() {
             #wordcountchart {
                 filter: invert(1) hue-rotate(180deg);
             }
+
+            .pdf-viewer {
+                background-color: #485263;
+            }
+
+            .conditional-invert-colors {
+                filter: invert(100%) hue-rotate(180deg);
+            }
         }
     `;
     let styleSheet = document.createElement("style");

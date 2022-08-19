@@ -27,6 +27,7 @@ let up_notifications_tracked_changes_updated = localStorage.getObject("notificat
 let up_notifications_tracked_changes_resolved =
     localStorage.getObject("notifications_tracked_changes_resolved") || true;
 let up_colormode_switching = localStorage.getObject("colormode_switching") || true;
+let up_colormode_switching_pdf = localStorage.getObject("colormode_switching_pdf") || true;
 let up_overalltheme_dark = localStorage.getObject("overalltheme_dark") || overallThemes_dark[0];
 let up_overalltheme_light = localStorage.getObject("overalltheme_light") || overallThemes_light[0];
 let up_editortheme_dark = localStorage.getObject("editortheme_dark") || editorThemes_dark[0];
@@ -117,6 +118,13 @@ function setupPreferencesPane() {
                         <div class="settings-toggle-switch"></div>
                         <span class="settings-toggle-label">Follow system</span>
                     </label>
+                    <label class="settings-toggle">
+                        <input id="colormode_switching_pdf" class="settings-toggle-checkbox" type="checkbox">
+                        <div class="settings-toggle-switch"></div>
+                        <span class="settings-toggle-label">Include PDF</span>
+                    </label>
+                    <br/>
+                    <i>This option forces the PDF to inverted colors, images may not be correctly displayed. This does not change the PDF file itself.</i>
                     <br/>
                     <br/>
                     <b>Dark Mode</b>
@@ -184,6 +192,7 @@ function setupPreferencesPane() {
         settings_form.querySelector("#notifications_tracked_changes_resolved").checked =
             up_notifications_tracked_changes_resolved;
         settings_form.querySelector("#colormode_switching").checked = up_colormode_switching;
+        settings_form.querySelector("#colormode_switching_pdf").checked = up_colormode_switching_pdf;
         settings_form.querySelector("#overalltheme_dark").value = up_overalltheme_dark;
         settings_form.querySelector("#overalltheme_light").value = up_overalltheme_light;
         settings_form.querySelector("#editortheme_dark").value = up_editortheme_dark;
@@ -193,6 +202,7 @@ function setupPreferencesPane() {
         settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
 
         // set the disabled values where necessary
+        settings_form.querySelector("#colormode_switching_pdf").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
@@ -237,6 +247,7 @@ const settings_handler = {
     notifications_tracked_changes_updated: set_notifications_tracked_changes_updated,
     notifications_tracked_changes_resolved: set_notifications_tracked_changes_resolved,
     colormode_switching: set_colormode_switching,
+    colormode_switching_pdf: set_colormode_switching_pdf,
     overalltheme_dark: set_overalltheme_dark,
     overalltheme_light: set_overalltheme_light,
     editortheme_dark: set_editortheme_dark,
@@ -382,11 +393,26 @@ function set_colormode_switching(key, value) {
     if (value.checked != up_colormode_switching) {
         up_colormode_switching = value.checked;
         localStorage.setObject(key, value.checked);
+        settings_form.querySelector("#colormode_switching_pdf").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
         if (up_colormode_switching == true) {
+            // register the event listener again
+            setupColormode();
+        } else {
+            // remove the event listener
+            destructColormode();
+        }
+    }
+}
+
+function set_colormode_switching_pdf(key, value) {
+    if (value.checked != up_colormode_switching_pdf) {
+        up_colormode_switching_pdf = value.checked;
+        localStorage.setObject(key, value.checked);
+        if (up_colormode_switching_pdf == true) {
             // register the event listener again
             setupColormode();
         } else {

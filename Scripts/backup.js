@@ -29,7 +29,7 @@ function isPDFLinkAvailable() {
     return getBackupElement(1);
 }
 
-function doBackup() {
+function makeBackup() {
     getBackupLink(up_backup_type);
     // use IndexedDB to write the backups in the background (because localstorage is too small), show an overview in the settings pane where users can download a backup
 }

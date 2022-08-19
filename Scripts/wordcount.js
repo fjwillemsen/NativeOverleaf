@@ -1,6 +1,5 @@
 // keep the ID of the interval timer so it can be removed later on
 let wordcount_timer_id;
-let compilation_observer;
 let wordcounts;
 
 // recursively check whether the PDF has been compiled with four attempts accross an increasing waittime
@@ -155,6 +154,8 @@ async function setupWordCount() {
             }
             compilation_observer.observe(pdf_element, {
                 attributes: true,
+                childList: true,
+                subTree: true,
             });
         }
     }

@@ -4,6 +4,8 @@
 let comments_watcher_unbind;
 let changes_watcher_unbind;
 let chat_observer;
+let compilation_observer;
+let pdf_change_observer;
 let colorscheme;
 
 // set whether external libraries are loaded
