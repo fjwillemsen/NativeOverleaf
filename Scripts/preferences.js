@@ -19,22 +19,21 @@ const editorThemes_light = {
 };
 
 // user preferences (abbreviated UP)
-let up_notifications_comments = localStorage.getObject("notifications_comment") || true;
-let up_notifications_comment_threads = localStorage.getObject("notifications_comment_response") || true;
-let up_notifications_chats = localStorage.getObject("notifications_chat") || true;
-let up_notifications_tracked_changes_created = localStorage.getObject("notifications_tracked_changes_created") || true;
-let up_notifications_tracked_changes_updated = localStorage.getObject("notifications_tracked_changes_updated") || true;
-let up_notifications_tracked_changes_resolved =
-    localStorage.getObject("notifications_tracked_changes_resolved") || true;
-let up_colormode_switching = localStorage.getObject("colormode_switching") || true;
-let up_colormode_switching_pdf = localStorage.getObject("colormode_switching_pdf") || true;
-let up_overalltheme_dark = localStorage.getObject("overalltheme_dark") || overallThemes_dark[0];
-let up_overalltheme_light = localStorage.getObject("overalltheme_light") || overallThemes_light[0];
-let up_editortheme_dark = localStorage.getObject("editortheme_dark") || editorThemes_dark[0];
-let up_editortheme_light = localStorage.getObject("editortheme_light") || editorThemes_light[0];
-let up_wordcount_tracking = localStorage.getObject("wordcount_tracking") || true; // whether wordcount tracking is enabled
-let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget") || 200; // net number of words that must be produced daily
-let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour") || 18; // hour of the day at which the user is notified whether they have achieved their goal
+let up_notifications_comments = localStorage.getObject("notifications_comment", true);
+let up_notifications_comment_threads = localStorage.getObject("notifications_comment_response", true);
+let up_notifications_chats = localStorage.getObject("notifications_chat", true);
+let up_notifications_tracked_changes_created = localStorage.getObject("notifications_tracked_changes_created", true);
+let up_notifications_tracked_changes_updated = localStorage.getObject("notifications_tracked_changes_updated", true);
+let up_notifications_tracked_changes_resolved = localStorage.getObject("notifications_tracked_changes_resolved", true);
+let up_colormode_switching = localStorage.getObject("colormode_switching", true);
+let up_colormode_switching_pdf = localStorage.getObject("colormode_switching_pdf");
+let up_overalltheme_dark = localStorage.getObject("overalltheme_dark", overallThemes_dark[0]);
+let up_overalltheme_light = localStorage.getObject("overalltheme_light", overallThemes_light[0]);
+let up_editortheme_dark = localStorage.getObject("editortheme_dark", editorThemes_dark[0]);
+let up_editortheme_light = localStorage.getObject("editortheme_light", editorThemes_light[0]);
+let up_wordcount_tracking = localStorage.getObject("wordcount_tracking", true); // whether wordcount tracking is enabled
+let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget", 200); // net number of words that must be produced daily
+let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour", 18); // hour of the day at which the user is notified whether they have achieved their goal
 
 // user preferences boundaries
 let up_wordcount_dailytarget_min = 1;

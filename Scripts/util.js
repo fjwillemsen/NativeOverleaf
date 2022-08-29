@@ -4,9 +4,12 @@
 Storage.prototype.setObject = function (key, value) {
     this.setItem(key, JSON.stringify(value));
 };
-Storage.prototype.getObject = function (key) {
+Storage.prototype.getObject = function (key, defaultvalue = undefined) {
     const value = this.getItem(key);
-    return value && JSON.parse(value);
+    if (value && value != undefined) {
+        return JSON.parse(value);
+    }
+    return defaultvalue;
 };
 
 // function that returns the current local date of the user as a "YYYY-MM-DD" formatted string

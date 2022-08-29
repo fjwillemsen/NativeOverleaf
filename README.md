@@ -78,7 +78,10 @@ For now, the following binaries have been precompiled and can be downloaded dire
 If your platform / architecture is missing, let me know via the [discussions page](https://github.com/fjwillemsen/NativeOverleaf/discussions), or compile it yourself using the instructions below. 
 
 ## How it works
-Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native features for a large number of supported platforms. <!-- may switch to [Multi](https://github.com/kofigumbs/multi) in the future -->
+Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native features for a large number of supported platforms. 
+<!-- may switch to [Multi](https://github.com/kofigumbs/multi), but macOS only -->
+<!-- qbrt would have been nice had it been further developed (discontinued) -->
+<!-- best option: Tauri (like [this](https://github.com/erayerdin/taurapp)) -->
 
 ## Troubleshooting
 If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
