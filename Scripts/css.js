@@ -64,6 +64,13 @@ function addCSS() {
             margin: auto;
             position: fixed;
             box-shadow: 5px;
+            border-radius: 10px;
+        }
+        dialog img {
+            max-width: 80%;       
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         dialog::backdrop {
             background: black;
@@ -76,6 +83,9 @@ function addCSS() {
                 background: #282A35;
                 color: white;
                 border-color: #485263;
+            }
+            dialog #closebutton {
+                color: white;
             }
             #wordcountchart {
                 filter: invert(1) hue-rotate(180deg);

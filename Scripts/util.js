@@ -17,6 +17,45 @@ function getLocalDate() {
     return new Date().toLocaleDateString("en-CA");
 }
 
+// function to retrieve the ShowdownJS library for converting Markdown to HTML
+async function insertShowdownJS() {
+    $.ajaxSetup({ cache: true });
+    return $.when($.getScript("https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"))
+        .done(() => {
+            lib_showdownjs_loaded = true;
+        })
+        .fail(() => {
+            alert("Unable to dynamically load ChartJS, do you have an active internet connection?");
+        });
+}
+
+// function that injects dialog HTML code in the proper location, adds close button and close-when-clicked-outside and returns reference to the element
+function injectDialog(id, innerhtml, insertionselector = "body") {
+    const html = `<dialog id=${id}>
+                    <span id="closebutton" class="close">&times;</span>
+                    ${innerhtml}
+                </dialog>`;
+    document.querySelector(insertionselector).insertAdjacentHTML("afterend", html);
+    // get the dialog object reference
+    const dialog = document.querySelector(`#${id}`);
+    // close the dialog if there is a click outside it
+    dialog.addEventListener("click", function (event) {
+        const rect = dialog.getBoundingClientRect();
+        if (
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom ||
+            event.clientX < rect.left ||
+            event.clientX > rect.right
+        ) {
+            dialog.close();
+        }
+    });
+    dialog.querySelector("#closebutton").addEventListener("click", function (event) {
+        dialog.close();
+    });
+    return dialog;
+}
+
 // function that checks a function returning a boolean and backs off for waitTime duration if it is not yet true, maximum numberOfTimesToCheck times
 function recursiveCheckAndWait(
     checkFunction,

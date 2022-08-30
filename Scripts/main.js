@@ -8,8 +8,9 @@ let compilation_observer;
 let pdf_change_observer;
 let colorscheme;
 
-// set whether external libraries are loaded
+// set whether external libraries are loaded (always check whether these are up to date!)
 let lib_chartjs_loaded = false;
+let lib_showdownjs_loaded = false;
 
 // get app version
 <<insert="appversion.js">>
@@ -53,6 +54,7 @@ setupPreferencesPane()
 addCSS()
 setAutoUpdateChecking()
 setupWordCount()
+showChangelogIfUpdated()
 // setupBackup()
 const endTime = performance.now();
 console.log(`Native Overleaf injected setup took ${endTime - startTime} milliseconds`);

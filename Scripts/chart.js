@@ -5,7 +5,7 @@ let wordcountchartdialog;
 let wordcountchart_show_net_wordcount = true; // whether to show the net wordcount or total wordcount
 
 // function to retrieve the library
-async function getChartJS() {
+async function insertChartJS() {
     $.ajaxSetup({ cache: true });
     return $.when($.getScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"))
         .done(() => {
@@ -17,7 +17,7 @@ async function getChartJS() {
 }
 
 function injectWordCountChartElement() {
-    const chart_html = `<dialog id="wordcountchartdialog">
+    const chart_html = `
             <p>Word count overview per day</p>
             <label class="settings-toggle">
                 <input id="show_net_wordcount" class="settings-toggle-checkbox" type="checkbox">
@@ -26,22 +26,8 @@ function injectWordCountChartElement() {
             </label>
             <div>
                 <canvas id="wordcountchart"></canvas>
-            </div>
-        </dialog>`;
-    document.querySelector("#chat-wrapper").insertAdjacentHTML("afterend", chart_html);
-    const dialog = document.querySelector("#wordcountchartdialog");
-    // close the dialog if there is a click outside it
-    dialog.addEventListener("click", function (event) {
-        const rect = dialog.getBoundingClientRect();
-        if (
-            event.clientY < rect.top ||
-            event.clientY > rect.bottom ||
-            event.clientX < rect.left ||
-            event.clientX > rect.right
-        ) {
-            dialog.close();
-        }
-    });
+            </div>`;
+    const dialog = injectDialog("wordcountchartdialog", chart_html, "#chat-wrapper");
     // set the options with their default value
     document.getElementById("show_net_wordcount").checked = wordcountchart_show_net_wordcount;
 
@@ -117,7 +103,7 @@ function updateWordCountChartData() {
 // show the modal with the chart
 async function showWordCountChart() {
     // don't load this by default
-    await getChartJS();
+    await insertChartJS();
     if (wordcountchartdialog == undefined) {
         // initialize
         wordcountchartdialog = injectWordCountChartElement();

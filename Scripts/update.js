@@ -6,6 +6,7 @@ async function fetchAsync(url) {
     return data;
 }
 
+// function to semantically compare whether version a is newer than version b
 function semanticVersionCompare(a, b) {
     // from https://gist.github.com/iwill/a83038623ba4fef6abb9efca87ae9ccb
     if (a.startsWith(b + "-")) return -1;
@@ -40,11 +41,9 @@ async function checkForUpdate(reportAll = false) {
             alert(result_text);
         }
     } else {
-        const result_text = `Invalid semantic version comparison outcome: ${comparison}`;
-        console.log(result_text);
-        if (reportAll == true) {
-            alert(result_text);
-        }
+        const result_text = `Update check failed, invalid semantic version comparison outcome: ${comparison}`;
+        console.warn(result_text);
+        alert(result_text);
     }
 }
 
@@ -58,6 +57,65 @@ function setAutoUpdateChecking() {
         document.querySelector("#versionlabel").onclick = function () {
             checkForUpdate(true);
         };
+    }
+}
+
+function checkIfUpdated() {
+    const previous_version = localStorage.getObject("previous_app_version", "0.1"); // always trigger if the previous app version is not in local storage
+    const comparison = semanticVersionCompare(appversion, previous_version);
+    if (comparison == 1 && comparison !== "") {
+        localStorage.setObject("previous_app_version", appversion);
+        return true;
+    } else if (comparison == 0) {
+        return false;
+    }
+    alert(`Invalid version comparison between ${appversion} and ${previous_version}, outcome: ${comparison}`);
+}
+
+async function showChangelogIfUpdated() {
+    const previous_version = localStorage.getObject("previous_app_version", undefined);
+    if (checkIfUpdated() == true) {
+        const release = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/releases/latest");
+        if (lib_showdownjs_loaded != true) {
+            await insertShowdownJS();
+        }
+        if (
+            lib_showdownjs_loaded != true ||
+            release == undefined ||
+            release.body == undefined ||
+            release.body == "" ||
+            release.name == undefined ||
+            release.name == "" ||
+            release.html_url == undefined ||
+            release.html_url == "" ||
+            release.tag_name == undefined ||
+            release.tag_name == ""
+        ) {
+            console.error(`Can not retrieve release notes of latest version, contents: ${release}`);
+            return;
+        }
+        // get the release notes and convert images hosted by GitHub to their raw location
+        let releasenotes_md = release.body;
+        const releasenotes_images = releasenotes_md.match(/!\[.*\]\(.*github\.com.*\)/gim);
+        if (releasenotes_images && releasenotes_images !== undefined && releasenotes_images.length > 0) {
+            releasenotes_images.forEach((github_image) => {
+                releasenotes_md = releasenotes_md.replace(github_image, github_image.replace("/blob/", "/raw/"));
+            });
+        }
+        // convert the release notes from MarkDown format to HTML
+        const markdown_converter = new showdown.Converter();
+        const releasenotes = markdown_converter.makeHtml(releasenotes_md);
+        // show the release notes in a dialog
+        const updated_to_text = previous_version !== undefined ? `from version ${previous_version} to` : "to version";
+        const changelog_html = `
+            <p style="font-size: 1.5em;">🥳 Updated ${updated_to_text} ${release.name}</p>
+            <div>
+                <p><i>Release notes of ${release.tag_name}:</i></p>
+                ${releasenotes}
+                <a href="${release.html_url}">View release online</a>
+            </div>`;
+        const dialog = injectDialog("updatechangelogdialog", changelog_html);
+        dialog.showModal();
     }
 }
 
