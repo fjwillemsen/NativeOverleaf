@@ -112,7 +112,7 @@ async function showChangelogIfUpdated() {
             <div>
                 <p><i>Release notes of ${release.tag_name}:</i></p>
                 ${releasenotes}
-                <a href="${release.html_url}">View release online</a>
+                <a href="${release.html_url}">View release online</a> or <a href="https://github.com/fjwillemsen/NativeOverleaf/releases">see all releases</a>
             </div>`;
         const dialog = injectDialog("updatechangelogdialog", changelog_html);
         dialog.showModal();
