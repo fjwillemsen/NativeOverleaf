@@ -15,12 +15,26 @@ function semanticVersionCompare(a, b) {
 }
 
 async function checkForUpdate(reportAll = false) {
+    // obtain the tags of the releases
     const tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
     if (!tags.length || tags.length === undefined) {
         console.error("Can not retrieve latest version for update checking");
         return;
     }
     const latest_version = tags[0].name.replace("v", "");
+
+    // first check if we have not already notified the user of this latest version
+    const previous_version_checked = localStorage.getObject("previous_version_checked");
+    if (
+        previous_version_checked !== undefined &&
+        semanticVersionCompare(latest_version, previous_version_checked) == 0
+    ) {
+        console.log("User already notified, skipping update notification");
+        return;
+    }
+    localStorage.setObject("previous_version_checked", latest_version);
+
+    // compare the latest release to the current appversion
     const comparison = semanticVersionCompare(latest_version, appversion);
     if (comparison == 0 && comparison !== "") {
         console.log("Update check completed, no update available.");
@@ -68,8 +82,12 @@ function checkIfUpdated() {
         return true;
     } else if (comparison == 0) {
         return false;
+    } else if (comparison == -1) {
+        // in case of a downgrade, silently set the previous app version to the current version
+        localStorage.setObject("previous_app_version", appversion);
+    } else {
+        alert(`Invalid version comparison between ${appversion} and ${previous_version}, outcome: ${comparison}`);
     }
-    alert(`Invalid version comparison between ${appversion} and ${previous_version}, outcome: ${comparison}`);
 }
 
 async function showChangelogIfUpdated() {
