@@ -75,7 +75,9 @@ function checkIfUpdated() {
 async function showChangelogIfUpdated() {
     const previous_version = localStorage.getObject("previous_app_version", undefined);
     if (checkIfUpdated() == true) {
-        const release = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/releases/latest");
+        const release = await fetchAsync(
+            `https://api.github.com/repos/fjwillemsen/NativeOverleaf/releases/tags/v${appversion}`
+        );
         if (lib_showdownjs_loaded != true) {
             await insertShowdownJS();
         }
