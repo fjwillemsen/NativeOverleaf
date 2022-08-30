@@ -18,7 +18,6 @@ describe("Local storage", () => {
         };
         localStorage.setObject("test_localstorage_object", object);
         const val = localStorage.getObject("test_localstorage_object");
-        console.log(val);
         expect(val).toMatchObject(object);
     });
 });
