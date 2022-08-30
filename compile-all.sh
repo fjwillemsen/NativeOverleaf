@@ -5,6 +5,9 @@ OUTPUT_GREEN='\033[0;32m'   # green
 OUTPUT_NC='\033[0m' # no color
 echo
 
+echo -e "${OUTPUT_ORANGE}Always check whether the dynamically included libraries (chartjs and showdownjs) are still up to date! ${OUTPUT_NC}"
+echo
+
 # run the unit tests
 echo "Running unit tests"
 npm run test
@@ -54,8 +57,8 @@ appversion="--app-version $appversionnumber"
 epochtime=$(date +%s)
 buildversion="--build-version $appversionnumber.$epochtime" 
 script="--inject bundled_script.js"
-internalurls="--internal-urls .*?(login|profile|engine|auth.*)\..*?(?<TLD>\.\w+?)(?:$|\/)"   # matches all *(login|profile|engine|auth*).*.<top-level-domain> URLs until the first forward-slash, may be a too greedy because it will also match slugs (e.g. domain.com/login.file.html)
-basecommand="nativefier https://overleaf.com $destination $name $appversion $buildversion $internalurls $script --overwrite"
+internalurls="--internal-urls .*?(login|profile|engine|auth|accounts.*)\..*?(?<TLD>\.\w+?)(?:$|\/)"   # matches all *(login|profile|engine|auth|accounts*).*.<top-level-domain> URLs until the first forward-slash, may be a too greedy because it will also match slugs (e.g. domain.com/login.file.html)
+basecommand="nativefier https://overleaf.com $destination $name $appversion $buildversion $internalurls $script --user-agent-honest --overwrite"
 
 # function to compile while filtering the nativefier output so only relevant output remains
 function compile() {
