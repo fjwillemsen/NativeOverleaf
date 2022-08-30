@@ -43,6 +43,7 @@ However, would it not be even better if it were to behave like a native app on y
 
 
 ## Next Features
+- [ ] addition to Homebrew for easier updates
 - [ ] automated local backups of projects (planned for future version)
 - [ ] date range selection for wordcount graph (planned for future version)
 - [ ] integrate Overleaf extensions (if technically possible, discussed here: [issue #8](https://github.com/fjwillemsen/NativeOverleaf/issues/8)) <!-- not supported but possible: https://github.com/nativefier/nativefier/issues/1433 Electron supports this: https://www.electronjs.org/docs/latest/api/extensions -->
@@ -58,7 +59,6 @@ However, would it not be even better if it were to behave like a native app on y
 - PDF dark mode works by inversing the colors and reversing the hue, meaning the white-grey-black scale is inversed while the colors remain largely the same. This can make graphics appear slightly different. PDF dark mode has been implemented by adjusting the PDF web viewer, not the source or the PDF itself, so downloaded files are untouched. 
 
 ## Download binary
-If there is interest in this project, I will add it to Homebrew for easy updates. 
 Should you have any problems running the app, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
 For now, the following binaries have been precompiled and can be downloaded directly:
 
