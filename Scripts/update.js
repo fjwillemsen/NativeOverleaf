@@ -104,7 +104,7 @@ function checkIfUpdated() {
     const previous_version = localStorage.getObject("previous_app_version", "0.1"); // always trigger if the previous app version is not in local storage
     const comparison = semanticVersionCompare(appversion, previous_version);
     if (comparison == 1 && comparison !== "") {
-        // localStorage.setObject("previous_app_version", appversion);
+        localStorage.setObject("previous_app_version", appversion);
         return true;
     } else if (comparison == 0) {
         return false;
