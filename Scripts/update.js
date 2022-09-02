@@ -6,7 +6,7 @@ async function fetchAsync(url) {
     return data;
 }
 
-// function to semantically compare whether version a is newer than version b
+// function to semantically compare versions, a > b = 1, a == b = 0, a < b = -1
 function semanticVersionCompare(a, b) {
     // from https://gist.github.com/iwill/a83038623ba4fef6abb9efca87ae9ccb
     if (a.startsWith(b + "-")) return -1;
@@ -14,14 +14,40 @@ function semanticVersionCompare(a, b) {
     return a.localeCompare(b, undefined, { numeric: true, sensitivity: "case", caseFirst: "upper" });
 }
 
-async function checkForUpdate(reportAll = false) {
-    // obtain the tags of the releases
+// function to obtain the tags of all releases
+async function getTags() {
     const tags = await fetchAsync("https://api.github.com/repos/fjwillemsen/NativeOverleaf/tags");
-    if (!tags.length || tags.length === undefined) {
+    if (tags == undefined || !tags.length || tags.length === undefined) {
         console.error("Can not retrieve latest version for update checking");
-        return;
     }
-    const latest_version = tags[0].name.replace("v", "");
+    return tags;
+}
+
+function tagToVersion(tag) {
+    return tag.replace("v", "");
+}
+
+function versionToTag(version) {
+    return `v${version}`;
+}
+
+// function to obtain the tags released after a release
+async function getTagsAfter(previous_version) {
+    let tags = await getTags();
+    if (tags && tags != undefined && tags.length) {
+        tags = tags.filter((tag) => {
+            const version = tagToVersion(tag.name);
+            return semanticVersionCompare(version, previous_version) == 1;
+        });
+        return tags.map((tag) => tag.name);
+    } else {
+        console.error("Could not get tags: ", tags);
+    }
+}
+
+async function checkForUpdate(reportAll = false) {
+    const tags = await getTags();
+    const latest_version = tagToVersion(tags[0].name);
 
     // first check if we have not already notified the user of this latest version
     const previous_version_checked = localStorage.getObject("previous_version_checked");
@@ -78,7 +104,7 @@ function checkIfUpdated() {
     const previous_version = localStorage.getObject("previous_app_version", "0.1"); // always trigger if the previous app version is not in local storage
     const comparison = semanticVersionCompare(appversion, previous_version);
     if (comparison == 1 && comparison !== "") {
-        localStorage.setObject("previous_app_version", appversion);
+        // localStorage.setObject("previous_app_version", appversion);
         return true;
     } else if (comparison == 0) {
         return false;
@@ -90,50 +116,80 @@ function checkIfUpdated() {
     }
 }
 
+// function to get the releases by tag names
+async function getReleasesByTags(tags) {
+    // call all tags in parallel, then wait for all to finish or any to reject
+    return await Promise.all(
+        tags.map(async (tag) => {
+            return fetchAsync(`https://api.github.com/repos/fjwillemsen/NativeOverleaf/releases/tags/${tag}`);
+        })
+    );
+}
+
 async function showChangelogIfUpdated() {
     const previous_version = localStorage.getObject("previous_app_version", undefined);
     if (checkIfUpdated() == true) {
-        const release = await fetchAsync(
-            `https://api.github.com/repos/fjwillemsen/NativeOverleaf/releases/tags/v${appversion}`
-        );
         if (lib_showdownjs_loaded != true) {
             await insertShowdownJS();
         }
-        if (
-            lib_showdownjs_loaded != true ||
-            release == undefined ||
-            release.body == undefined ||
-            release.body == "" ||
-            release.name == undefined ||
-            release.name == "" ||
-            release.html_url == undefined ||
-            release.html_url == "" ||
-            release.tag_name == undefined ||
-            release.tag_name == ""
-        ) {
-            console.error(`Can not retrieve release notes of latest version, contents: ${release}`);
-            return;
-        }
-        // get the release notes and convert images hosted by GitHub to their raw location
-        let releasenotes_md = release.body;
-        const releasenotes_images = releasenotes_md.match(/!\[.*\]\(.*github\.com.*\)/gim);
-        if (releasenotes_images && releasenotes_images !== undefined && releasenotes_images.length > 0) {
-            releasenotes_images.forEach((github_image) => {
-                releasenotes_md = releasenotes_md.replace(github_image, github_image.replace("/blob/", "/raw/"));
-            });
-        }
-        // convert the release notes from MarkDown format to HTML
+        // get the tags of releases after the previous version
+        const tags_after_previous = await getTagsAfter(previous_version);
+        // get all releases after the previous version
+        const releases = await getReleasesByTags(tags_after_previous);
+        console.log(releases);
         const markdown_converter = new showdown.Converter();
-        const releasenotes = markdown_converter.makeHtml(releasenotes_md);
+        // for each release, extract the release notes in HTML form
+        const all_releasenotes = releases
+            .map((release) => {
+                if (
+                    lib_showdownjs_loaded != true ||
+                    release == undefined ||
+                    release.body == undefined ||
+                    release.body == "" ||
+                    release.name == undefined ||
+                    release.name == "" ||
+                    release.html_url == undefined ||
+                    release.html_url == "" ||
+                    release.tag_name == undefined ||
+                    release.tag_name == ""
+                ) {
+                    console.error(`Can not retrieve release notes, contents: ${release}`);
+                    return;
+                }
+                // get the release notes and convert images hosted by GitHub to their raw location
+                let releasenotes_md = release.body;
+                const releasenotes_images = releasenotes_md.match(/!\[.*\]\(.*github\.com.*\)/gim);
+                if (releasenotes_images && releasenotes_images !== undefined && releasenotes_images.length > 0) {
+                    releasenotes_images.forEach((github_image) => {
+                        releasenotes_md = releasenotes_md.replace(
+                            github_image,
+                            github_image.replace("/blob/", "/raw/")
+                        );
+                    });
+                }
+                // convert the release notes from MarkDown format to HTML
+                const releasenotes = markdown_converter.makeHtml(releasenotes_md);
+                return `
+                    <div>
+                        <p><i>Release notes of </i>${release.name}:</p>
+                        ${releasenotes}
+                        <a href="${release.html_url}">View release online</a>
+                        <hr/>
+                    </div>`;
+            })
+            .join("");
         // show the release notes in a dialog
         const updated_to_text = previous_version !== undefined ? `from version ${previous_version} to` : "to version";
+        const versions_in_between =
+            releases.length > 1 ? `<p style="font-size: 1.2em;">Release notes of ${releases.length} versions:</p>` : "";
         const changelog_html = `
-            <p style="font-size: 1.5em;">🥳 Updated ${updated_to_text} ${release.name}</p>
+            <p style="font-size: 1.5em;">🥳 Updated ${updated_to_text} ${tagToVersion(releases[0].tag_name)}</p>
             <div>
-                <p><i>Release notes of ${release.tag_name}:</i></p>
-                ${releasenotes}
-                <a href="${release.html_url}">View release online</a> or <a href="https://github.com/fjwillemsen/NativeOverleaf/releases">see all releases</a>
-            </div>`;
+                ${versions_in_between}
+                <hr/>
+                ${all_releasenotes}
+            </div>
+            <a href="https://github.com/fjwillemsen/NativeOverleaf/releases">View all releases online</a>`;
         const dialog = injectDialog("updatechangelogdialog", changelog_html);
         dialog.showModal();
     }
