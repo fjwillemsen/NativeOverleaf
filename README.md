@@ -87,7 +87,7 @@ Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf websi
 If you have any problem running the app not fixed with these instructions, please [comment on or open an issue](https://github.com/fjwillemsen/NativeOverleaf/issues)!
 
 ### Institutional login
-This has been fixed in v1.4.0. If you encounter a related issue, look at [issue #3](https://github.com/fjwillemsen/NativeOverleaf/issues/3) or open a new issue. 
+This has been fixed since v1.4.0. If you encounter a related issue, look at and comment on [issue #3](https://github.com/fjwillemsen/NativeOverleaf/issues/3). 
 
 ### Unable to open on Mac
 If you get the message that "Apple can't verify this app doesn't contain malware", use right-click -> open to open it. 
