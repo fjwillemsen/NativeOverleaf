@@ -3,6 +3,15 @@
 // inserting CSS
 function addCSS() {
     const css_text = `
+        body {
+            background-color: #fff;
+            color: black;
+        }
+
+        .loading-screen {
+            background-color: #fff;
+        }
+
         .native-overleaf-settings {
             display: inline-block;
             width: 260px;
@@ -77,8 +86,62 @@ function addCSS() {
             opacity: 0.7;
             backdrop-filter: blur(25px);
         }
+
+        #review-panel {
+            background-color: #dadfed;
+            color: #6b7797;
+            border-left: 0 solid #d9d9d9;
+        }
+
+        .review-panel-toolbar {
+            background-color: #fafafa;
+        }
+
+        .rp-entry {
+            background-color: #fff;
+            color: #6b7797;
+        }
+
+        .rp-comment-input {
+            background-color: #fff;
+        }
+
+        .rp-nav {
+            background-color: #fafafa;
+        }
+
+        .file-view {
+            background-color: #f0f0f0;
+        }
+
+        .history-entry-details {
+            background-color: #fff;
+            color: #5d6879;
+        }
+
+        .history-entry-change-doc {
+            color: #3f3f3f;
+        }
+
+        .history-labels-list, .history-labels-list-compare {
+            background-color: #fff;
+        }
         
         @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #282a35;
+                color: white;
+            }
+
+            .loading-screen {
+                background-color: #282a35;
+            }
+
+            .loading-panel {
+                background-color: #282a35;
+                color: white;
+            }
+
             dialog {
                 background: #282A35;
                 color: white;
@@ -97,6 +160,71 @@ function addCSS() {
 
             .conditional-invert-colors {
                 filter: invert(100%) hue-rotate(180deg);
+            }
+
+            #review-panel {
+                background-color: #485263 !important;
+                color: white !important;
+                border-left: 0 solid black !important;
+            }
+
+            .review-panel-toolbar {
+                background-color: #282a35 !important;
+            }
+
+            .rp-entry {
+                background-color: #d1cfbc !important;
+                color: darkslategray !important;
+            }
+
+            .rp-comment-input {
+                background-color: floralwhite !important;
+            }
+
+            .rp-nav {
+                background-color: floralwhite !important;
+            }
+
+            .file-view {
+                background-color: #282a35 !important;
+            }
+
+            .history-entry-details {
+                background-color: #485263 !important;
+                color: floralwhite !important;
+            }
+
+            .history-entry-change-doc {
+                color: floralwhite !important;
+            }
+
+            .history-labels-list, .history-labels-list-compare {
+                background-color: #485263 !important;
+            }
+
+            .project-list-main {
+                background-color: #485263;
+            }
+
+            .project-list-card {
+                background-color: #282a35;
+                color: white;
+            }
+
+            .project-list-table-name-link {
+                color: lightskyblue;
+            }
+
+            .project-list-table-row:hover {
+                background-color: darkslategray;
+            }
+
+            .current-plan a.current-plan-label {
+                color: floralwhite;
+            }
+
+            footer.site-footer {
+                background-color: black;
             }
         }
     `;
