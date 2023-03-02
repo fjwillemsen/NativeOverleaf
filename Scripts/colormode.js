@@ -7,10 +7,12 @@ const overallThemeToOverleaf = {
 };
 
 function switchColorModePDF() {
-    if (current_colorscheme_preference == "dark") {
-        $(".pdf-viewer .pdfjs-viewer .page").addClass("conditional-invert-colors");
-    } else if (current_colorscheme_preference == "light") {
-        $(".pdf-viewer .pdfjs-viewer .page").removeClass("conditional-invert-colors");
+    if (up_colormode_switching_pdf == true) {
+        if (current_colorscheme_preference == "dark") {
+            $(".pdf-viewer .pdfjs-viewer .page").addClass("conditional-invert-colors");
+        } else if (current_colorscheme_preference == "light") {
+            $(".pdf-viewer .pdfjs-viewer .page").removeClass("conditional-invert-colors");
+        }
     }
 }
 

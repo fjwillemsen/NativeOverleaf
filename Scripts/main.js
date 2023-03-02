@@ -45,13 +45,14 @@ if (window.matchMedia) {
 <<insert="wordcount.js">>
 <<insert="backup.js">>
 <<insert="chart.js">>
+// <<insert="extension_writefull.js">>
 
 // start
 const startTime = performance.now();
 setupColormode()
 setupNotifications()
 setupPreferencesPane()
-addCSS()
+setCSS()
 setAutoUpdateChecking()
 setupWordCount()
 showChangelogIfUpdated()

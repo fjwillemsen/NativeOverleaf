@@ -34,6 +34,7 @@ let up_editortheme_light = localStorage.getObject("editortheme_light", editorThe
 let up_wordcount_tracking = localStorage.getObject("wordcount_tracking", true); // whether wordcount tracking is enabled
 let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget", 200); // net number of words that must be produced daily
 let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour", 18); // hour of the day at which the user is notified whether they have achieved their goal
+let up_editor_font_family = localStorage.getObject("editor_font_family", "");
 
 // user preferences boundaries
 let up_wordcount_dailytarget_min = 1;
@@ -110,6 +111,10 @@ function setupPreferencesPane() {
                         <div class="settings-toggle-switch"></div>
                         <span class="settings-toggle-label">Resolved suggestions</span>
                     </label>
+                <hr/>
+                <h6>Customizations</h6>
+                    <label>Editor font family <br/><i>(leave empty for default)</i></label>
+                    <input id="editor_font_family" type="text"/>
                 <hr/>
                 <h6>Dark / Light Mode</h6>
                     <label class="settings-toggle">
@@ -199,6 +204,7 @@ function setupPreferencesPane() {
         settings_form.querySelector("#wordcount_tracking").checked = up_wordcount_tracking;
         settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
         settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
+        settings_form.querySelector("#editor_font_family").value = up_editor_font_family;
 
         // set the disabled values where necessary
         settings_form.querySelector("#colormode_switching_pdf").disabled = !up_colormode_switching;
@@ -254,6 +260,7 @@ const settings_handler = {
     wordcount_tracking: set_wordcount_tracking,
     wordcount_dailytarget: set_wordcount_dailytarget,
     wordcount_notificationhour: set_wordcount_notificationhour,
+    editor_font_family: set_editor_font_family,
 };
 
 function set_notifications_tracked_changes_created(key, value) {
@@ -381,6 +388,18 @@ function set_notifications_comment_response(key, value) {
         // register the eventlisteners again
         destructNotifications();
         setupNotifications();
+    }
+}
+
+//
+// Customization
+//
+
+function set_editor_font_family(key, value) {
+    if (value.value != up_editor_font_family) {
+        up_editor_font_family = value.value;
+        localStorage.setObject(key, value.value);
+        setCSS();
     }
 }
 

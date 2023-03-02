@@ -133,6 +133,7 @@ function setHasBeenNotified(value) {
 }
 
 // setup the repeated execution of updateWordCount
+var last_compile_wordcount_time = -60;
 async function setupWordCount() {
     if (up_wordcount_tracking == true) {
         if (this.project_id === undefined) {
@@ -143,13 +144,19 @@ async function setupWordCount() {
         if ((await waitUntilPDFCompiled()) != false) {
             // set the initial word count on load
             updateWordCount();
+            last_compile_wordcount_time = getTimeInSeconds();
 
             // set the observer for when the PDF is recompiled
             let pdf_element = getBackupElement(1);
             if (compilation_observer === undefined) {
                 compilation_observer = new MutationObserver(function (mutations) {
-                    console.log("PDF compiled, updating wordcount");
-                    updateWordCount();
+                    if (current_time - last_compile_wordcount_time < 60) {
+                        console.log("PDF compiled, but wordcount already recalculated in the last 60 seconds");
+                    } else {
+                        console.log("PDF compiled, updating wordcount");
+                        updateWordCount();
+                        last_compile_wordcount_time = getTimeInSeconds();
+                    }
                 });
             }
             compilation_observer.observe(pdf_element, {

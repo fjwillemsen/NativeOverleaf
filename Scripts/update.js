@@ -52,6 +52,7 @@ async function checkForUpdate(reportAll = false) {
     // first check if we have not already notified the user of this latest version
     const previous_version_checked = localStorage.getObject("previous_version_checked");
     if (
+        reportAll == false &&
         previous_version_checked !== undefined &&
         semanticVersionCompare(latest_version, previous_version_checked) == 0
     ) {

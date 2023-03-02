@@ -12,12 +12,23 @@ Storage.prototype.getObject = function (key, defaultvalue = undefined) {
     return defaultvalue;
 };
 
-// function that returns the current local date of the user as a "YYYY-MM-DD" formatted string
+/**
+ * Function that returns the current local date of the user as a "YYYY-MM-DD" formatted string
+ */
 function getLocalDate() {
     return new Date().toLocaleDateString("en-CA");
 }
 
-// function to retrieve the ShowdownJS library for converting Markdown to HTML
+/**
+ * Function to get the time in seconds since epoch
+ */
+function getTimeInSeconds() {
+    return Math.round(new Date().getTime() / 1000);
+}
+
+/**
+ * Function to retrieve the ShowdownJS library for converting Markdown to HTML
+ */
 async function insertShowdownJS() {
     $.ajaxSetup({ cache: true });
     return $.when($.getScript("https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"))
@@ -29,7 +40,13 @@ async function insertShowdownJS() {
         });
 }
 
-// function that injects dialog HTML code in the proper location, adds close button and close-when-clicked-outside and returns reference to the element
+/**
+ * Function that injects dialog HTML code in the proper location, adds close button and close-when-clicked-outside and returns reference to the element
+ * @param {Number} id
+ * @param {string} innerhtml
+ * @param {string} insertionselector
+ * @returns
+ */
 function injectDialog(id, innerhtml, insertionselector = "body") {
     const html = `<dialog id=${id}>
                     <span id="closebutton" class="close">&times;</span>
@@ -56,7 +73,15 @@ function injectDialog(id, innerhtml, insertionselector = "body") {
     return dialog;
 }
 
-// function that checks a function returning a boolean and backs off for waitTime duration if it is not yet true, maximum numberOfTimesToCheck times
+/**
+ * Function that checks a function returning a boolean and backs off for waitTime seconds. If it is not yet true, maximum numberOfTimesToCheck times.
+ * @param {Function} checkFunction
+ * @param {Number} waitTime
+ * @param {Number} numberOfTimesToCheck
+ * @param {Number} multiplyWaitTime
+ * @param {Number} numberOfTimesChecked
+ * @returns
+ */
 function recursiveCheckAndWait(
     checkFunction,
     waitTime,
@@ -94,7 +119,9 @@ function recursiveCheckAndWait(
     }
 }
 
-// function for mapping the difference between two objects
+/**
+ * Function for mapping the difference between two objects
+ */
 const deepDiffMapper = (function () {
     return {
         VALUE_CREATED: "created",

@@ -1,20 +1,21 @@
 // This file is not intended to run by itself, but is inserted into main.js
 
-// inserting CSS
-function addCSS() {
-    const css_text = `
+/**
+ * Function to insert CSS
+ */
+function setCSS() {
+    var css_text = `
         body {
             background-color: #fff;
             color: black;
         }
 
-        .loading-screen {
-            background-color: #fff;
+        #left-menu {
+            color: black;
         }
 
-        .native-overleaf-settings {
-            display: inline-block;
-            width: 260px;
+        .loading-screen {
+            background-color: #fff;
         }
 
         .settings-toggle {
@@ -228,6 +229,17 @@ function addCSS() {
             }
         }
     `;
+    // add the editor font family if specified
+    let editor_font_family = up_editor_font_family;
+    if (up_editor_font_family.length <= 0) {
+        editor_font_family = "inherit";
+    }
+    css_text += `
+        .cm-editor {
+            --source-font-family: ${editor_font_family} !important;
+        }`;
+
+    // set the CSS
     let styleSheet = document.createElement("style");
     styleSheet.innerText = css_text;
     document.head.appendChild(styleSheet);
