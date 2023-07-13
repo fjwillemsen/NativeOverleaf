@@ -17,6 +17,12 @@ const editorThemes_light = {
     overleaf: "Overleaf",
     eclipse: "Eclipse",
 };
+const pdfThemes_dark = {
+    dark: "Inverted",
+};
+const pdfThemes_light = {
+    light: "Standard",
+};
 
 // user preferences (abbreviated UP)
 let up_notifications_comments = localStorage.getObject("notifications_comment", true);
@@ -26,11 +32,12 @@ let up_notifications_tracked_changes_created = localStorage.getObject("notificat
 let up_notifications_tracked_changes_updated = localStorage.getObject("notifications_tracked_changes_updated", true);
 let up_notifications_tracked_changes_resolved = localStorage.getObject("notifications_tracked_changes_resolved", true);
 let up_colormode_switching = localStorage.getObject("colormode_switching", true);
-let up_colormode_switching_pdf = localStorage.getObject("colormode_switching_pdf");
-let up_overalltheme_dark = localStorage.getObject("overalltheme_dark", overallThemes_dark[0]);
-let up_overalltheme_light = localStorage.getObject("overalltheme_light", overallThemes_light[0]);
-let up_editortheme_dark = localStorage.getObject("editortheme_dark", editorThemes_dark[0]);
-let up_editortheme_light = localStorage.getObject("editortheme_light", editorThemes_light[0]);
+let up_overalltheme_dark = localStorage.getObject("overalltheme_dark", Object.keys(overallThemes_dark)[0]);
+let up_overalltheme_light = localStorage.getObject("overalltheme_light", Object.keys(overallThemes_light)[0]);
+let up_editortheme_dark = localStorage.getObject("editortheme_dark", Object.keys(editorThemes_dark)[0]);
+let up_editortheme_light = localStorage.getObject("editortheme_light", Object.keys(editorThemes_light)[0]);
+let up_pdftheme_dark = localStorage.getObject("pdftheme_dark", Object.keys(pdfThemes_dark)[0]);
+let up_pdftheme_light = localStorage.getObject("pdftheme_light", Object.keys(pdfThemes_light)[0]);
 let up_wordcount_tracking = localStorage.getObject("wordcount_tracking", true); // whether wordcount tracking is enabled
 let up_wordcount_dailytarget = localStorage.getObject("wordcount_dailytarget", 200); // net number of words that must be produced daily
 let up_wordcount_notificationhour = localStorage.getObject("wordcount_notificationhour", 18); // hour of the day at which the user is notified whether they have achieved their goal
@@ -122,13 +129,6 @@ function setupPreferencesPane() {
                         <div class="settings-toggle-switch"></div>
                         <span class="settings-toggle-label">Follow system</span>
                     </label>
-                    <label class="settings-toggle">
-                        <input id="colormode_switching_pdf" class="settings-toggle-checkbox" type="checkbox">
-                        <div class="settings-toggle-switch"></div>
-                        <span class="settings-toggle-label">Include PDF</span>
-                    </label>
-                    <br/>
-                    <i>This option forces the PDF viewer to inverted colors. This does not change the PDF file itself.</i>
                     <br/>
                     <br/>
                     <b>Dark Mode</b>
@@ -141,6 +141,11 @@ function setupPreferencesPane() {
                         <label for="editortheme_dark">Editor</label>
                         <select id="editortheme_dark">
                             ${getFormSelectHTML([editorThemes_dark, editorThemes_light], ["dark", "light"])}
+                        </select>
+                        <br/>
+                        <label for="pdftheme_dark">PDF viewer</label>
+                        <select id="pdftheme_dark">
+                            ${getFormSelectHTML([pdfThemes_dark, pdfThemes_light], ["dark", "light"])}
                         </select>
                     <br/>
                     <br/>
@@ -155,6 +160,15 @@ function setupPreferencesPane() {
                         <select id="editortheme_light">
                             ${getFormSelectHTML([editorThemes_light, editorThemes_dark], ["light", "dark"])}
                         </select>
+                        <br/>
+                        <label for="pdftheme_light">PDF viewer</label>
+                        <select id="pdftheme_light">
+                            ${getFormSelectHTML([pdfThemes_light, pdfThemes_dark], ["light", "dark"])}
+                        </select>
+                    <br/>
+                    <br/>
+                    <i>The PDF option "inverted" forces the PDF viewer to inverted colors. This does not change the PDF file itself.</i>
+                    <br/>
                 <hr/>
                 <h6>Wordcount Tracking</h6>
                     <p>When the document is recompiled, this keeps track of the number of words, allowing you to see your progress.</p>
@@ -196,22 +210,24 @@ function setupPreferencesPane() {
         settings_form.querySelector("#notifications_tracked_changes_resolved").checked =
             up_notifications_tracked_changes_resolved;
         settings_form.querySelector("#colormode_switching").checked = up_colormode_switching;
-        settings_form.querySelector("#colormode_switching_pdf").checked = up_colormode_switching_pdf;
         settings_form.querySelector("#overalltheme_dark").value = up_overalltheme_dark;
         settings_form.querySelector("#overalltheme_light").value = up_overalltheme_light;
         settings_form.querySelector("#editortheme_dark").value = up_editortheme_dark;
         settings_form.querySelector("#editortheme_light").value = up_editortheme_light;
+        settings_form.querySelector("#pdftheme_dark").value = up_pdftheme_dark;
+        settings_form.querySelector("#pdftheme_light").value = up_pdftheme_light;
         settings_form.querySelector("#wordcount_tracking").checked = up_wordcount_tracking;
         settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
         settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
         settings_form.querySelector("#editor_font_family").value = up_editor_font_family;
 
         // set the disabled values where necessary
-        settings_form.querySelector("#colormode_switching_pdf").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
+        settings_form.querySelector("#pdftheme_dark").disabled = !up_colormode_switching;
+        settings_form.querySelector("#pdftheme_light").disabled = !up_colormode_switching;
         settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
         settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
 
@@ -252,11 +268,12 @@ const settings_handler = {
     notifications_tracked_changes_updated: set_notifications_tracked_changes_updated,
     notifications_tracked_changes_resolved: set_notifications_tracked_changes_resolved,
     colormode_switching: set_colormode_switching,
-    colormode_switching_pdf: set_colormode_switching_pdf,
     overalltheme_dark: set_overalltheme_dark,
     overalltheme_light: set_overalltheme_light,
     editortheme_dark: set_editortheme_dark,
     editortheme_light: set_editortheme_light,
+    pdftheme_dark: set_pdftheme_dark,
+    pdftheme_light: set_pdftheme_light,
     wordcount_tracking: set_wordcount_tracking,
     wordcount_dailytarget: set_wordcount_dailytarget,
     wordcount_notificationhour: set_wordcount_notificationhour,
@@ -411,26 +428,13 @@ function set_colormode_switching(key, value) {
     if (value.checked != up_colormode_switching) {
         up_colormode_switching = value.checked;
         localStorage.setObject(key, value.checked);
-        settings_form.querySelector("#colormode_switching_pdf").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
         settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
+        settings_form.querySelector("#pdftheme_dark").disabled = !up_colormode_switching;
+        settings_form.querySelector("#pdftheme_light").disabled = !up_colormode_switching;
         if (up_colormode_switching == true) {
-            // register the event listener again
-            setupColormode();
-        } else {
-            // remove the event listener
-            destructColormode();
-        }
-    }
-}
-
-function set_colormode_switching_pdf(key, value) {
-    if (value.checked != up_colormode_switching_pdf) {
-        up_colormode_switching_pdf = value.checked;
-        localStorage.setObject(key, value.checked);
-        if (up_colormode_switching_pdf == true) {
             // register the event listener again
             setupColormode();
         } else {
@@ -464,4 +468,12 @@ function set_editortheme_dark(key, value) {
 
 function set_editortheme_light(key, value) {
     themesetter("up_editortheme_light", key, value);
+}
+
+function set_pdftheme_dark(key, value) {
+    themesetter("up_pdftheme_dark", key, value);
+}
+
+function set_pdftheme_light(key, value) {
+    themesetter("up_pdftheme_light", key, value);
 }

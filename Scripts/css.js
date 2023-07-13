@@ -127,6 +127,10 @@ function setCSS() {
         .history-labels-list, .history-labels-list-compare {
             background-color: #fff;
         }
+
+        .conditional-invert-colors {
+            filter: invert(100%) hue-rotate(180deg);
+        }
         
         @media (prefers-color-scheme: dark) {
             body {
@@ -157,10 +161,6 @@ function setCSS() {
 
             .pdf-viewer {
                 background-color: #485263;
-            }
-
-            .conditional-invert-colors {
-                filter: invert(100%) hue-rotate(180deg);
             }
 
             #review-panel {

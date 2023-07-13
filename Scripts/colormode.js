@@ -7,12 +7,13 @@ const overallThemeToOverleaf = {
 };
 
 function switchColorModePDF() {
-    if (up_colormode_switching_pdf == true) {
-        if (current_colorscheme_preference == "dark") {
-            $(".pdf-viewer .pdfjs-viewer .page").addClass("conditional-invert-colors");
-        } else if (current_colorscheme_preference == "light") {
-            $(".pdf-viewer .pdfjs-viewer .page").removeClass("conditional-invert-colors");
-        }
+    current_pdfcolor = current_colorscheme_preference == "dark" ? up_pdftheme_dark : up_pdftheme_light;
+    if (current_pdfcolor == "dark") {
+        $(".pdf-viewer .pdfjs-viewer .page").addClass("conditional-invert-colors");
+    } else if (current_pdfcolor == "light") {
+        $(".pdf-viewer .pdfjs-viewer .page").removeClass("conditional-invert-colors");
+    } else {
+        console.error(`current pdfcolor preference ${current_pdfcolor} is not a valid value`);
     }
 }
 
@@ -26,7 +27,7 @@ function switchColorMode() {
             scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_light];
             scope.settings["editorTheme"] = up_editortheme_light;
         } else {
-            console.err(`current colorscheme preference ${current_colorscheme_preference} is not a valid value`);
+            console.error(`current colorscheme preference ${current_colorscheme_preference} is not a valid value`);
         }
         scope.$apply();
         switchColorModePDF();
@@ -44,7 +45,7 @@ async function setupColormode() {
         // listen to when the colorscheme changes
         colorscheme.addEventListener("change", autoChangeColorMode, true);
     }
-    if (up_colormode_switching_pdf == true && (await waitUntilPDFCompiled()) != false) {
+    if ((await waitUntilPDFCompiled()) != false) {
         // apply the color mode directly
         switchColorModePDF();
         // when the PDF is changed, apply the color mode
@@ -70,11 +71,12 @@ async function setupColormode() {
     }
 }
 function destructColormode() {
+    // remove the eventlistener for changes to the system theme
     if (colorscheme !== undefined && up_colormode_switching == false) {
         colorscheme.removeEventListener("change", autoChangeColorMode, true);
     }
     // no longer listen for when the PDF changes
-    if (up_colormode_switching_pdf == false && pdf_change_observer !== undefined) {
+    if (pdf_change_observer !== undefined) {
         pdf_change_observer.disconnect();
         $(".pdf-viewer .pdfjs-viewer .page").removeClass("conditional-invert-colors");
     }
