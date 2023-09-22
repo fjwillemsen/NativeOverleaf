@@ -18,7 +18,10 @@ function switchColorModePDF() {
 }
 
 function switchColorMode() {
-    let scope = angular.element("[ng-controller=SettingsController]").scope();
+    console.log("switchColormode");
+    // let scope = angular.element("[ng-controller=SettingsController]").scope();
+    let scope = angular.element(document.querySelector(".settings")).scope();
+    console.log(scope);
     if (scope) {
         if (current_colorscheme_preference == "dark") {
             scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_dark];

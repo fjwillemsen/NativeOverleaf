@@ -120,6 +120,29 @@ function recursiveCheckAndWait(
 }
 
 /**
+ * Function for waiting for a DOM element to appear, from https://stackoverflow.com/a/61511955/7009556
+ */
+function waitForElm(selector) {
+    return new Promise((resolve) => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver((mutations) => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    });
+}
+
+/**
  * Function for mapping the difference between two objects
  */
 const deepDiffMapper = (function () {

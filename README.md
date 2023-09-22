@@ -1,3 +1,8 @@
+**URGENT HELP NEEDED**
+
+Recently the settings panel of Native Overleaf was broken by changes to Overleaf.
+Please help us get the app back in working order by discussing in [issue #32](https://github.com/fjwillemsen/NativeOverleaf/issues/32)!
+
 # Native Overleaf
 Overleaf is a fantastic webtool for writing and cooperating on LaTeX documents. 
 However, would it not be even better if it were to behave like a native app on your system? 
@@ -20,7 +25,7 @@ However, would it not be even better if it were to behave like a native app on y
 - [Troubleshooting](#troubleshooting)
   - [Institutional login](#institutional-login)
   - [Unable to open on Mac](#unable-to-open-on-mac)
-  - [Wordcounts & projects](#wordcounts--projects)
+  - [Wordcounts \& projects](#wordcounts--projects)
 - [Compile your own](#compile-your-own)
 - [Ideas, questions, contributions?](#ideas-questions-contributions)
 
