@@ -94,11 +94,14 @@ function setAutoUpdateChecking() {
     // check for updates every six hours
     setInterval(checkForUpdate, 6 * 60 * 60 * 1000);
     // trigger the check update function when the version label is clicked
-    if (document.querySelector("#versionlabel")) {
-        document.querySelector("#versionlabel").onclick = function () {
-            checkForUpdate(true);
-        };
-    }
+    waitForElm("#versionlabel").then((elm) => {
+        if (document.querySelector("#versionlabel")) {
+            document.querySelector("#versionlabel").onclick = function () {
+                console.log("Checking version:");
+                checkForUpdate(true);
+            };
+        }
+    });
 }
 
 function checkIfUpdated() {

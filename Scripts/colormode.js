@@ -39,7 +39,6 @@ function switchColorMode() {
             }
             // scope.$apply();
             console.log("Applied scope change");
-            console.log(scope);
             console.log(angular.element("[ng-controller=IdeController]").scope());
             switchColorModePDF();
         });

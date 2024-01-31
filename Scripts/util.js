@@ -36,7 +36,7 @@ async function insertShowdownJS() {
             lib_showdownjs_loaded = true;
         })
         .fail(() => {
-            alert("Unable to dynamically load ChartJS, do you have an active internet connection?");
+            alert("Unable to dynamically load ShowdownJS, do you have an active internet connection?");
         });
 }
 
