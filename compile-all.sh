@@ -99,8 +99,10 @@ options="--darwin-dark-mode-support --counter --bounce --fast-quit"
 compile $platform "arm64" $icon $options
 compile $platform "x64" $icon $options
 echo "Codesigning Mac apps"
-codesign --deep --force -s "NativeOverleaf" Binaries/Overleaf-darwin-arm64/Overleaf.app
-codesign --deep --force -s "NativeOverleaf" Binaries/Overleaf-darwin-x64/Overleaf.app
+xattr -c Binaries/Overleaf-darwin-arm64/Overleaf.app
+xattr -c Binaries/Overleaf-darwin-x64/Overleaf.app
+codesign -s - -f --deep Binaries/Overleaf-darwin-arm64/Overleaf.app
+codesign -s - -f --deep Binaries/Overleaf-darwin-x64/Overleaf.app
 echo ""
 
 # Linux

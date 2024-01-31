@@ -1,6 +1,6 @@
 {
     "name": "native-overleaf",
-    "version": "1.9.1",
+    "version": "1.9.2",
     "description": "Next-level academia by extending Overleaf in a native package.",
     "main": "bundled_script.js",
     "scripts": {
