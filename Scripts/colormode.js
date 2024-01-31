@@ -20,20 +20,32 @@ function switchColorModePDF() {
 function switchColorMode() {
     console.log("switchColormode");
     // let scope = angular.element("[ng-controller=SettingsController]").scope();
-    let scope = angular.element(document.querySelector(".settings")).scope();
+    // let scope = angular.element(document.querySelector(".settings")).scope();
+    // let scope = angular.element(document.querySelector("[ng-controller=IdeController]")).scope();
+    let scope = angular.element("[ng-controller=IdeController]").scope();
     console.log(scope);
-    if (scope) {
-        if (current_colorscheme_preference == "dark") {
-            scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_dark];
-            scope.settings["editorTheme"] = up_editortheme_dark;
-        } else if (current_colorscheme_preference == "light") {
-            scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_light];
-            scope.settings["editorTheme"] = up_editortheme_light;
-        } else {
-            console.error(`current colorscheme preference ${current_colorscheme_preference} is not a valid value`);
-        }
-        scope.$apply();
-        switchColorModePDF();
+    if (scope && scope.settings) {
+        scope.$applyAsync(function () {
+            if (current_colorscheme_preference == "dark") {
+                scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_dark];
+                scope.darkTheme = !up_overalltheme_light;
+                scope.settings["editorTheme"] = up_editortheme_dark;
+            } else if (current_colorscheme_preference == "light") {
+                scope.settings["overallTheme"] = overallThemeToOverleaf[up_overalltheme_light];
+                scope.darkTheme = !up_overalltheme_light;
+                scope.settings["editorTheme"] = up_editortheme_light;
+            } else {
+                console.error(`current colorscheme preference ${current_colorscheme_preference} is not a valid value`);
+            }
+            // scope.$apply();
+            console.log("Applied scope change");
+            console.log(scope);
+            console.log(angular.element("[ng-controller=IdeController]").scope());
+            switchColorModePDF();
+        });
+    } else {
+        console.log("No scope settings:");
+        console.log(scope);
     }
 }
 
