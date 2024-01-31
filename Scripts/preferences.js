@@ -200,70 +200,82 @@ function setupPreferencesPane() {
             waitForElm("#left-menu").then((elm) => {
                 if (document.querySelector("#left-menu")) {
                     // insert the HTML code
-                    document
-                        .querySelector("#left-menu")
-                        .getElementsByTagName("form")[0]
-                        .insertAdjacentHTML("afterend", settings_html);
+                    waitForElm(".settings").then((elm) => {
+                        console.log(elm.querySelector(".settings"));
+                        if (document.querySelector(".settings")) {
+                            document
+                                .querySelector("#left-menu")
+                                .getElementsByTagName("form")[0]
+                                .insertAdjacentHTML("afterend", settings_html);
 
-                    // set the settings to their current values
-                    settings_form = document.querySelector("#native-overleaf-settings");
-                    settings_form.querySelector("#notifications_chat").checked = up_notifications_chats;
-                    settings_form.querySelector("#notifications_comment").checked = up_notifications_comments;
-                    settings_form.querySelector("#notifications_comment_response").checked =
-                        up_notifications_comment_threads;
-                    settings_form.querySelector("#notifications_tracked_changes_created").checked =
-                        up_notifications_tracked_changes_created;
-                    settings_form.querySelector("#notifications_tracked_changes_updated").checked =
-                        up_notifications_tracked_changes_updated;
-                    settings_form.querySelector("#notifications_tracked_changes_resolved").checked =
-                        up_notifications_tracked_changes_resolved;
-                    settings_form.querySelector("#colormode_switching").checked = up_colormode_switching;
-                    settings_form.querySelector("#overalltheme_dark").value = up_overalltheme_dark;
-                    settings_form.querySelector("#overalltheme_light").value = up_overalltheme_light;
-                    settings_form.querySelector("#editortheme_dark").value = up_editortheme_dark;
-                    settings_form.querySelector("#editortheme_light").value = up_editortheme_light;
-                    settings_form.querySelector("#pdftheme_dark").value = up_pdftheme_dark;
-                    settings_form.querySelector("#pdftheme_light").value = up_pdftheme_light;
-                    settings_form.querySelector("#wordcount_tracking").checked = up_wordcount_tracking;
-                    settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
-                    settings_form.querySelector("#wordcount_notificationhour").value = up_wordcount_notificationhour;
-                    settings_form.querySelector("#editor_font_family").value = up_editor_font_family;
+                            // set the settings to their current values
+                            settings_form = document.querySelector("#native-overleaf-settings");
+                            settings_form.querySelector("#notifications_chat").checked = up_notifications_chats;
+                            settings_form.querySelector("#notifications_comment").checked = up_notifications_comments;
+                            settings_form.querySelector("#notifications_comment_response").checked =
+                                up_notifications_comment_threads;
+                            settings_form.querySelector("#notifications_tracked_changes_created").checked =
+                                up_notifications_tracked_changes_created;
+                            settings_form.querySelector("#notifications_tracked_changes_updated").checked =
+                                up_notifications_tracked_changes_updated;
+                            settings_form.querySelector("#notifications_tracked_changes_resolved").checked =
+                                up_notifications_tracked_changes_resolved;
+                            settings_form.querySelector("#colormode_switching").checked = up_colormode_switching;
+                            settings_form.querySelector("#overalltheme_dark").value = up_overalltheme_dark;
+                            settings_form.querySelector("#overalltheme_light").value = up_overalltheme_light;
+                            settings_form.querySelector("#editortheme_dark").value = up_editortheme_dark;
+                            settings_form.querySelector("#editortheme_light").value = up_editortheme_light;
+                            settings_form.querySelector("#pdftheme_dark").value = up_pdftheme_dark;
+                            settings_form.querySelector("#pdftheme_light").value = up_pdftheme_light;
+                            settings_form.querySelector("#wordcount_tracking").checked = up_wordcount_tracking;
+                            settings_form.querySelector("#wordcount_dailytarget").value = up_wordcount_dailytarget;
+                            settings_form.querySelector("#wordcount_notificationhour").value =
+                                up_wordcount_notificationhour;
+                            settings_form.querySelector("#editor_font_family").value = up_editor_font_family;
 
-                    // set the disabled values where necessary
-                    settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
-                    settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
-                    settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
-                    settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
-                    settings_form.querySelector("#pdftheme_dark").disabled = !up_colormode_switching;
-                    settings_form.querySelector("#pdftheme_light").disabled = !up_colormode_switching;
-                    settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
-                    settings_form.querySelector("#wordcount_notificationhour").disabled = !up_wordcount_tracking;
+                            // set the disabled values where necessary
+                            settings_form.querySelector("#overalltheme_dark").disabled = !up_colormode_switching;
+                            settings_form.querySelector("#overalltheme_light").disabled = !up_colormode_switching;
+                            settings_form.querySelector("#editortheme_dark").disabled = !up_colormode_switching;
+                            settings_form.querySelector("#editortheme_light").disabled = !up_colormode_switching;
+                            settings_form.querySelector("#pdftheme_dark").disabled = !up_colormode_switching;
+                            settings_form.querySelector("#pdftheme_light").disabled = !up_colormode_switching;
+                            settings_form.querySelector("#wordcount_dailytarget").disabled = !up_wordcount_tracking;
+                            settings_form.querySelector("#wordcount_notificationhour").disabled =
+                                !up_wordcount_tracking;
 
-                    // listen for changes and trigger setting change handlers
-                    settings_form.addEventListener("change", function () {
-                        for (let id_key in settings_handler) {
-                            settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`));
-                        }
-                    });
+                            // listen for changes and trigger setting change handlers
+                            settings_form.addEventListener("change", function () {
+                                for (let id_key in settings_handler) {
+                                    settings_handler[id_key](id_key, settings_form.querySelector(`#${id_key}`));
+                                }
+                            });
 
-                    // listen for button clicks
-                    document.getElementById("button_show_wordcount_graph").addEventListener("click", () => {
-                        showWordCountChart();
-                    });
-                    document.getElementById("button_reset_wordcount").addEventListener("click", () => {
-                        let text_number_of_days = "";
-                        if (wordcounts !== undefined && wordcounts[this.project_id] !== undefined) {
-                            text_number_of_days = `You currently have ${
-                                Object.keys(wordcounts[this.project_id]).length
-                            } tracked days.`;
-                        }
-                        const resetWordCount = confirm(`Are you sure you want to remove all tracked wordcount history?
+                            // listen for button clicks
+                            document.getElementById("button_show_wordcount_graph").addEventListener("click", () => {
+                                showWordCountChart();
+                            });
+                            document.getElementById("button_reset_wordcount").addEventListener("click", () => {
+                                let text_number_of_days = "";
+                                if (wordcounts !== undefined && wordcounts[this.project_id] !== undefined) {
+                                    text_number_of_days = `You currently have ${
+                                        Object.keys(wordcounts[this.project_id]).length
+                                    } tracked days.`;
+                                }
+                                const resetWordCount =
+                                    confirm(`Are you sure you want to remove all tracked wordcount history?
                             ${text_number_of_days}`);
-                        if (resetWordCount) {
-                            resetWordCounts();
-                            setupWordCount();
+                                if (resetWordCount) {
+                                    resetWordCounts();
+                                    setupWordCount();
+                                }
+                            });
+                        } else {
+                            console.log("No element '.settings'");
                         }
                     });
+                } else {
+                    console.log("No element '#left-menu'");
                 }
             });
         });
