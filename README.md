@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## Important notice on the future of Native Overleaf
 As many of you are aware, recent changes to Overleaf have made it very hard to keep this project in good condition. For example, the settings panel of Native Overleaf was broken by changes on Overleaf's end (see [issue #32](https://github.com/fjwillemsen/NativeOverleaf/issues/32)). I have tried my best to work around these issues, but this is not sustainable. This means that Native Overleaf is not able to provide the stability needed to use it in daily work, and I will no longer be working towards fixing the individual issues.
 
@@ -8,15 +7,6 @@ In the meantime, I will try to provide security & maintainance updates to Native
 
 If you feel like discussing this, please see [discussions #38](https://github.com/fjwillemsen/NativeOverleaf/discussions/38). 
 
-=======
-**Important: some bad and good news**
-
-First, the bad news. As many of you are aware, recent changes to Overleaf have made it very hard to keep this project in good condition. For example, the settings panel of Native Overleaf was broken by changes on Overleaf's end. I have tried my best to work around these issues, but this is not sustainable. This means that Native Overleaf is not able to provide the stability needed to use it in daily work, and I will no longer be working towards fixing the individual issues. 
-
-The good news: I am very grateful for the overwhelmingly positive response Native Overleaf has had over the past two years and would like to create something even better. I believe it is necessary to start from the ground up to create a completely new solution that will not have these issues, something worthy of serving the academic community. I am currently working on this, and hope to share this with all of you soon. 
-
----
->>>>>>> 7360ebbeb61a1c7f329e561215b85778f08f8c06
 
 # Native Overleaf
 Overleaf is a fantastic webtool for writing and cooperating on LaTeX documents. 
