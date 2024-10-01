@@ -27,6 +27,7 @@ However, would it not be even better if it were to behave like a native app on y
   - [**Mac**](#mac)
   - [**Linux**](#linux)
   - [**Windows**](#windows)
+- [Installation on Linux](#installation-on-linux)
 - [How it works](#how-it-works)
 - [Troubleshooting](#troubleshooting)
   - [Institutional login](#institutional-login)
@@ -87,6 +88,26 @@ For now, the following binaries have been precompiled and can be downloaded dire
 * [X86 (64-bit)](https://github.com/fjwillemsen/NativeOverleaf/releases/latest/download/Overleaf-win32-x64.zip)
 
 If your platform / architecture is missing, let me know via the [discussions page](https://github.com/fjwillemsen/NativeOverleaf/discussions), or compile it yourself using the instructions below. 
+
+## Installation on Linux
+
+After downloading the zip-file you should extract it and move the directory to `sudo mv /path/to/Overleaf-linux-x64 /opt/`. </br>
+Then you can create a Desktop Entry in `/usr/share/applications` </br>
+```
+$ cd /usr/share/applications
+$ sudo nano overleaf.desktop
+$ sudo vim overleaf.desktop
+
+[Desktop Entry]
+Name=Overleaf
+Type=Application
+Terminal=false
+Icon=/opt/Overleaf-linux-x64/resources/app/icon.png
+Exec=/opt/Overleaf-linux-x64/Overleaf
+Categories=Science
+```
+
+After ca. 30 seconds you should see Overleaf as a Desktop entry. This is tested for **Debian 12**.
 
 ## How it works
 Using [nativefier](https://github.com/nativefier/nativefier), the Overleaf website is wrapped as an Electron app and injected with JavaScript. While this is not optimally efficient and we may switch to a more efficient framework in the future, it does allow combining the webapp with native features for a large number of supported platforms. 
